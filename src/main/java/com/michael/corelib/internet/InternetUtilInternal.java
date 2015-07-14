@@ -26,23 +26,6 @@ class InternetUtilInternal {
 		return null;
 	}
 
-
-	/**
-	 * 大文件下载接口
-	 *
-	 * @param context
-	 * @param imageUrl
-	 * @return
-	 */
-//	public static String requestBigResourceWithCache(Context context, String imageUrl, List<NameValuePair> headers) throws NetWorkException {
-//		if (context != null && HttpClientFactory.createHttpClientInterface(context.getApplicationContext()) != null) {
-//            return HttpClientFactory.createHttpClientInterface(context.getApplicationContext()).getInputStreamResourceCallBackMode(
-//                     imageUrl, "GET", null, headers);
-//		}
-//
-//		return null;
-//	}
-
     public static InputStream requestInputstreamResource(Context context, String url, List<NameValuePair> headers) throws NetWorkException {
         if (context != null && HttpClientFactory.createHttpClientInterface(context.getApplicationContext()) != null) {
             return HttpClientFactory.createHttpClientInterface(context.getApplicationContext()).getInputStreamResource(url, "GET", null, headers);
@@ -50,11 +33,6 @@ class InternetUtilInternal {
 
         return null;
     }
-
-//    @Deprecated
-//	public static void setHttpBeanRequestImpl(BeanRequestInterface impl) {
-//		BeanRequestFactory.setgBeanRequestInterfaceImpl(impl);
-//	}
 
     @Deprecated
 	public static void setHttpReturnListener(Context context, HttpRequestHookListener l) {

@@ -1,2 +1,2 @@
-# corelib
-corelib
+[2015-07-14]--------------------
+1, 增加了LOG路径的设置接口 CoreConfig.init

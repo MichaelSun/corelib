@@ -32,9 +32,18 @@ public class FileInfo {
 
     @Override
     public String toString() {
-        return "FileInfo [fileName=" + fileName + ", filePath=" + filePath + ", fileSize=" + fileSize + ", IsDir="
-                + isDir + ", Count=" + count + ", ModifiedDate=" + modifiedDate + ", Selected=" + selected
-                + ", canRead=" + canRead + ", canWrite=" + canWrite + ", isHidden=" + isHidden + ", dbId=" + dbId + "]";
+        return "FileInfo{" +
+                   "fileName='" + fileName + '\'' +
+                   ", filePath='" + filePath + '\'' +
+                   ", fileSize=" + fileSize +
+                   ", isDir=" + isDir +
+                   ", count=" + count +
+                   ", modifiedDate=" + modifiedDate +
+                   ", selected=" + selected +
+                   ", canRead=" + canRead +
+                   ", canWrite=" + canWrite +
+                   ", isHidden=" + isHidden +
+                   ", dbId=" + dbId +
+                   '}';
     }
-    
 }

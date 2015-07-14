@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * catch (Exception e) { e.printStackTrace(); } } }));
  **/
 
-public final class CustomThreadPool extends SingleInstanceBase implements Destroyable {
+public final class CustomThreadPool implements Destroyable, SingleInstanceManager.SingleInstanceBase {
     private static final String TAG = "RRThreadPool";
 
     private static final boolean USING_CUSTOM_THREADPOOL = true;
@@ -186,7 +186,7 @@ public final class CustomThreadPool extends SingleInstanceBase implements Destro
     private HashMap<String, ThreadPoolExecutor> mSpecialExectorMap;
 
     public static CustomThreadPool getInstance() {
-        return SingleInstanceBase.getInstance(CustomThreadPool.class);
+        return SingleInstanceManager.getSingleInstanceByClass(CustomThreadPool.class);
     }
 
     public static void asyncWork(Runnable run) {
@@ -245,7 +245,7 @@ public final class CustomThreadPool extends SingleInstanceBase implements Destro
     }
 
     @Override
-    protected void init(Context context) {
+    public void init(Context context) {
     }
 
     public boolean excute(TaskWrapper task) {

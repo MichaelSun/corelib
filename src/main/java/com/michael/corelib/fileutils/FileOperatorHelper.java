@@ -7,7 +7,11 @@ import java.util.LinkedList;
 
 public class FileOperatorHelper {
 
-    public static void DeleteFile(FileInfo f) {
+    /**
+     * 删除文件或者文件夹
+     * @param f
+     */
+    public static void deleteFile(FileInfo f) {
         if (f == null) {
             return;
         }
@@ -17,7 +21,7 @@ public class FileOperatorHelper {
         if (directory) {
             for (File child : file.listFiles()) {
                 if (FileUtil.isNormalFile(child.getAbsolutePath())) {
-                    DeleteFile(FileUtil.getFileInfo(child));
+                    deleteFile(FileUtil.getFileInfo(child));
                 }
             }
         }

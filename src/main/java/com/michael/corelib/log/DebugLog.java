@@ -21,7 +21,7 @@ public class DebugLog {
 
 	private static final String TAG = "DebugLog";
 
-	private static final String LOG_DIR = CoreConfig.LOG_DIR;
+	private static final String LOG_DIR = CoreConfig.ROOT_DIR;
 	private static String LOG_CURR_FILENAME = "debug_log.txt";
 
 	private static final long MAX_LOGFILE_SIZE = 2 * 1024 * 1024;

@@ -22,8 +22,7 @@ public class DownloadResponse {
     DownloadResponse() {
     }
 
-    DownloadResponse(String downloadUrl, String rawPath,
-                     DownloadRequest request) {
+    DownloadResponse(String downloadUrl, String rawPath, DownloadRequest request) {
         mDownloadUrl = downloadUrl;
         mLocalRawPath = rawPath;
         mRequest = request;
@@ -43,9 +42,10 @@ public class DownloadResponse {
 
     @Override
     public String toString() {
-        return "DownloadResponse [mDownloadUrl=" + mDownloadUrl
-                   + ", mLocalRawPath=" + mLocalRawPath + ", mRequest="
-                   + mRequest + "]";
+        return "DownloadResponse{" +
+                   "mDownloadUrl='" + mDownloadUrl + '\'' +
+                   ", mLocalRawPath='" + mLocalRawPath + '\'' +
+                   ", mRequest=" + mRequest +
+                   '}';
     }
-
 }
