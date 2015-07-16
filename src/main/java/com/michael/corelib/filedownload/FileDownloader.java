@@ -5,8 +5,8 @@ import android.os.Environment;
 import android.text.TextUtils;
 import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.coreutils.*;
-import com.michael.corelib.fileutils.FileUtil;
 import com.michael.corelib.internet.InternetClient;
+import com.michael.corelib.io.FileUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -64,43 +64,15 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
             int sliptor = downloadUrl.lastIndexOf(File.separator);
             if (pos != -1 && sliptor != -1 && pos > sliptor) {
                 String prefix = downloadUrl.substring(0, pos);
-                return StringUtils.stringHashCode((prefix.replace(":", "+").replace("/", "_").replace(".", "-") + downloadUrl.substring(pos)));
+                return StringUtils.generateSHA1String((prefix.replace(":", "+").replace("/", "_").replace(".", "-") + downloadUrl.substring(pos)));
             }
-            return StringUtils.stringHashCode(downloadUrl.replace(":", "+").replace("/", "_").replace(".", "-"));
+            return StringUtils.generateSHA1String(downloadUrl.replace(":", "+").replace("/", "_").replace(".", "-"));
         }
 
     }
 
     protected DownloadFilenameCreateListener mDefaultDownloadFilenameCreateListener = new DefaultDownloadUrlEncodeListener();
     protected DownloadFilenameCreateListener mDownloadFilenameCreateListener = mDefaultDownloadFilenameCreateListener;
-
-//    protected static class DownloadListenerObj {
-//
-//        public final DownloadRequest.DownloadListener mDownloadListener;
-//
-//        public final String mFileUrl;
-//
-//        public final int code;
-//
-//        DownloadListenerObj(String url, DownloadRequest.DownloadListener listener) {
-//            mDownloadListener = listener;
-//            mFileUrl = url;
-//            code = mFileUrl.hashCode();
-//        }
-//
-//        @Override
-//        public boolean equals(Object obj) {
-//            DownloadListenerObj downloadObj = (DownloadListenerObj) obj;
-//            if (downloadObj.code == code
-//                    && downloadObj.mDownloadListener == mDownloadListener) {
-//                return true;
-//            }
-//
-//            return false;
-//        }
-//    }
-//
-//    protected List<DownloadListenerObj> mListenerList;
 
     public interface WorkListener {
         void onProcessWork(Runnable r);
@@ -351,6 +323,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
 
     /**
      * 检查下载的文件是否合法
+     *
      * @param filePath
      * @return
      */
@@ -526,7 +499,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                     CoreConfig.LOGD("[[FileDownloader::onInputStreamReturn]] save Request url : "
                                         + saveUrl
                                         + " success ||||||| and the saved file size : "
-                                        + FileUtil.convertStorage(new File(savePath).length())
+                                        + (new File(savePath).length())
                                         + ", save cost time = "
                                         + (successTime - curTime) + "ms");
                 }
@@ -592,7 +565,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
 
                     String cacheFile = null;
                     InputStream is = InternetClient.getInstance(mContext).downloadFile(request.mDownloadUrl,
-                                                                   onCheckRequestHeaders(request.mDownloadUrl, request.getHeaders()));
+                                                                                          onCheckRequestHeaders(request.mDownloadUrl, request.getHeaders()));
                     if (is != null) {
                         cacheFile = onInputStreamReturn(request, is);
                     }
@@ -743,36 +716,18 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
             ext = "";
         }
         File newFile = new File(dir.getAbsolutePath() + "/" + cachelFile.getName() + ext);
-		// 重命名成功
+        // 重命名成功
         if (isExternalStorageAvailable() && cachelFile.renameTo(newFile)) {
             CoreConfig.LOGD("[[FileDownloader::mvFileToDownloadedDir]] move cached file to : " + newFile.getAbsolutePath());
             return newFile.getAbsolutePath();
         }
 
-        // 如果重命名失败，则通过拷贝实现
-        InputStream is = null;
-        OutputStream os = null;
         try {
-            is = new FileInputStream(cachelFile);
-            os = null;
-            if (dir.getAbsolutePath().startsWith("/data/data")) {
-                CoreConfig.LOGD("open world readable file" + " successfully InstallApp=======" + cachelFile.getName() + ext);
-                os = mContext.openFileOutput(cachelFile.getName() + ext, Context.MODE_WORLD_READABLE);
-            } else {
-                CoreConfig.LOGD("new FileOutputStream, InstallApp");
-                os = new FileOutputStream(newFile);
-            }
-            CoreConfig.LOGD("----- move cached file to + "
-                                + newFile.getAbsolutePath()
-                                + " successfully InstallApp=======");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        if (FileUtil.copy(is, os)) {
+            FileUtils.copyFile(cachelFile, newFile);
             cachelFile.delete();
             return newFile.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return null;
