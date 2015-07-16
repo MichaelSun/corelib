@@ -1,5 +1,5 @@
 /**
- * Copyright (C)  2007 - 2010 kaixin001
+ * Copyright (C)  2007 - 2010
  */
 
 package com.michael.corelib.log;

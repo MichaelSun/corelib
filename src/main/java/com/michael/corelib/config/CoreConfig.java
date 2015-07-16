@@ -2,8 +2,9 @@ package com.michael.corelib.config;
 
 import android.content.Context;
 import android.os.Environment;
+import com.michael.corelib.corelog.CoreLog;
+import com.michael.corelib.corelog.DebugLog;
 import com.michael.corelib.coreutils.SingleInstanceManager;
-import com.michael.corelib.log.DebugLog;
 
 import java.io.File;
 
@@ -21,6 +22,8 @@ public class CoreConfig {
     public static boolean DEBUG = new File(ROOT_DIR, ".log").exists();
 
     public static boolean CORE_LIB_INIT;
+
+    private static DebugLog DEFAULT_DEBUG_LOG = CoreLog.getInstance().getDebugLogByFileName("");
 
     /**
      * 初始化corelib
@@ -49,19 +52,19 @@ public class CoreConfig {
 
     public static void LOGD(String msg) {
         if (DEBUG) {
-            DebugLog.d("", msg);
+            DEFAULT_DEBUG_LOG.d("", msg);
         }
     }
 
     public static void LOGD(String tag, String msg) {
         if (DEBUG) {
-            DebugLog.d(tag, msg);
+            DEFAULT_DEBUG_LOG.d(tag, msg);
         }
     }
 
     public static void LOGD(String msg, Throwable e) {
         if (DEBUG) {
-            DebugLog.d("", msg, e);
+            DEFAULT_DEBUG_LOG.d("", msg, e);
         }
     }
 }
