@@ -26,14 +26,6 @@ public class DebugLog {
 
 	private static final long MAX_LOGFILE_SIZE = 2 * 1024 * 1024;
 
-	public static final boolean DEBUG = CoreConfig.DEBUG;
-	public static final boolean LOGVV = true && DEBUG;
-	public static final boolean LOGV = true && DEBUG;
-	public static final boolean LOGD = true && DEBUG;
-	public static final boolean LOGW = true && DEBUG;
-	public static final boolean LOGE = true && DEBUG;
-	public static final boolean LOGR = true && DEBUG;
-
 	/**
 	 * flag to control if dump the log to console
 	 */
@@ -84,10 +76,6 @@ public class DebugLog {
 	 *            An exception to log
 	 */
 	public void vv(String tag, String msg, Throwable tr) {
-		if (!LOGVV) {
-			return;
-		}
-
 		writeLog(VERBOSE_VERBOSE_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
@@ -123,10 +111,6 @@ public class DebugLog {
 	 *            An exception to log
 	 */
 	public void v(String tag, String msg, Throwable tr) {
-		if (!LOGV) {
-			return;
-		}
-
 		writeLog(VERBOSE_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
@@ -162,10 +146,6 @@ public class DebugLog {
 	 *            An exception to log
 	 */
 	public void d(String tag, String msg, Throwable tr) {
-		if (!LOGD) {
-			return;
-		}
-
 		writeLog(DEBUG_TAG, tag, msg, tr);
 		if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
@@ -201,10 +181,6 @@ public class DebugLog {
 	 *            An exception to log
 	 */
 	public void w(String tag, String msg, Throwable tr) {
-		if (!LOGW) {
-			return;
-		}
-
 		writeLog(WARNING_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
@@ -240,10 +216,6 @@ public class DebugLog {
 	 *            An exception to log
 	 */
 	public void e(String tag, String msg, Throwable tr) {
-		if (!LOGE) {
-			return;
-		}
-
 		writeLog(ERORR_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
@@ -279,10 +251,6 @@ public class DebugLog {
 	 *            An exception to log
 	 */
 	public void r(String tag, String msg, Throwable tr) {
-		if (!LOGR) {
-			return;
-		}
-
 		writeLog(RELEASE_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
