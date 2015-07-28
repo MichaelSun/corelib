@@ -16,7 +16,10 @@ public class HttpClientFactory {
             CoreConfig.LOGD("[[createHttpClientInterface]] proxy type = " + ret.getClass().getName());
 
             gHttpClientInterface = (HttpClientInterface) ret;
-            gHttpClientInterface.init(context);
+            if (!gHttpClientInterface.init(context)) {
+                //TODO: may be performance error
+                gHttpClientInterface = null;
+            }
         }
 
         return gHttpClientInterface;

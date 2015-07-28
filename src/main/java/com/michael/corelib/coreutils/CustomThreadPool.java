@@ -10,12 +10,6 @@ import java.util.HashMap;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * //usage for RRThreadPool RRThreadPool.getInstance().excute(new
- * RRTaskWrapper(new Runnable(){ public void run() { try { Thread.sleep(5000); }
- * catch (Exception e) { e.printStackTrace(); } } }));
- **/
-
 public final class CustomThreadPool implements Destroyable, SingleInstanceManager.SingleInstanceBase {
     private static final String TAG = "RRThreadPool";
 

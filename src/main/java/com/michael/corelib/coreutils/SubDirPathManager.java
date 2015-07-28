@@ -1,8 +1,4 @@
-/**
- * DiskManager.java
- */
 package com.michael.corelib.coreutils;
-
 
 import android.content.Context;
 import com.michael.corelib.config.CoreConfig;

@@ -27,9 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-/**
- * Utilities for working with strings, like splitting, url-encoding, and MD5 digests.
- */
 public class StringUtils {
 
     /** Splits a String based on a single character, which is usually faster than regex-based String.split(). */

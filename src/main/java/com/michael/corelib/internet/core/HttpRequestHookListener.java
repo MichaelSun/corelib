@@ -1,11 +1,8 @@
-/**
- * HttpReturnInterface.java
- */
 package com.michael.corelib.internet.core;
 
-import java.io.InputStream;
-
 import org.apache.http.client.methods.HttpRequestBase;
+
+import java.io.InputStream;
 
 /**
  * @author Guoqing Sun Nov 15, 20125:50:13 PM

@@ -9,22 +9,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * manager
- *
- * @author Guoqing Sun Nov 6, 20122:05:39 PM
- */
 public class SingleInstanceManager {
 
-    /**
-     * @author Guoqing Sun Nov 5, 20129:09:50 PM
-     */
     public interface SingleInstanceBase {
 
         void init(Context context);
 
     }
-
 
     private static final String TAG = "SingleInstanceManager";
 

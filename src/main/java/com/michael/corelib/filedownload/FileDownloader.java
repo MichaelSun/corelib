@@ -192,48 +192,6 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
         return null;
     }
 
-//    public boolean postRequest(DownloadRequest request, DownloadRequest.DownloadListener l) {
-//        if (mRequestList == null || request == null
-//                || TextUtils.isEmpty(request.mDownloadUrl) || l == null) {
-//            return false;
-//        }
-//
-//        DownloadListenerObj downloadObj = new DownloadListenerObj(request.mDownloadUrl, l);
-//        boolean contain = false;
-//        synchronized (mListenerList) {
-//            for (DownloadListenerObj obj : mListenerList) {
-//                if (downloadObj.equals(obj)) {
-//                    contain = true;
-//                }
-//            }
-//            if (!contain) {
-//                mListenerList.add(downloadObj);
-//            }
-//        }
-//
-//        // 检查是否已经下载过此request对应的文件
-//        String cachedFile = checkFromCache(request);
-//        if (!TextUtils.isEmpty(cachedFile)) {
-//            File file = new File(cachedFile);
-//            if (file.exists()) {
-//                DownloadResponse response = makeDownloadResponse(cachedFile,
-//                                                                       request);
-//                if (response != null) {
-//                    mSuccessHandler.notifyAll(-1, -1, response);
-//                    handleProcess(request.mDownloadUrl, (int) file.length(),
-//                                     (int) file.length());
-//                    if (l != null) {
-//                        handleResponseByListener(DOWNLOAD_SUCCESS,
-//                                                    request.mDownloadUrl, response, false);
-//                    }
-//                }
-//                return true;
-//            }
-//        }
-//
-//        return postRequest(request);
-//    }
-
     /**
      * 新提交的request会默认
      *

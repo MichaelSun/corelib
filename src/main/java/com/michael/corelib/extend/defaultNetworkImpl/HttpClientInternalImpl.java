@@ -16,12 +16,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -33,6 +35,8 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.util.List;
 
 /**
@@ -60,10 +64,44 @@ public class HttpClientInternalImpl implements HttpClientInterface {
     }
 
     @Override
-    public void init(Context context) {
+    public boolean init(Context context) {
         mContext = context;
-        httpClient = createHttpClient();
-        httpClientByte = createHttpClientByte();
+        try {
+            httpClient = createHttpClient();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+        try {
+            httpClientByte = createHttpClientByte();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+
+        if (httpClient == null || httpClientByte == null) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -247,26 +285,34 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         }
     }
 
-    private DefaultHttpClient createHttpClientByte() {
-        final SchemeRegistry supportedSchemes = new SchemeRegistry();
-        supportedSchemes.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), HTTP_PORT));
-//		supportedSchemes.register(new Scheme("https", EasySSLSocketFactory
-//				.getSocketFactory(), 443));
-//        supportedSchemes.register(new Scheme("https", SSLSocketFactoryEx.getSocketFactory(), 443));
-        final HttpParams httpParams = createHttpParams();
-        final ThreadSafeClientConnManager tccm = new ThreadSafeClientConnManager(httpParams, supportedSchemes);
+    private DefaultHttpClient createHttpClientByte() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, KeyManagementException {
+        HttpParams httpParams = createHttpParams();
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        trustStore.load(null, null);
+        SSLSocketFactory sf = new SSLSocketFactoryEx(trustStore);
+        sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        SchemeRegistry schReg = new SchemeRegistry();
+        schReg.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        schReg.register(new Scheme("https", sf, 443));
+        ThreadSafeClientConnManager tccm = new ThreadSafeClientConnManager(httpParams, schReg);
+
         DefaultHttpClient client = new DefaultHttpClient(tccm, httpParams);
         client.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
         return client;
     }
 
-    private DefaultHttpClient createHttpClient() {
-        final SchemeRegistry supportedSchemes = new SchemeRegistry();
-        supportedSchemes.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-//        supportedSchemes.register(new Scheme("https", SSLSocketFactoryEx.getSocketFactory(), 443));
-        final HttpParams httpParams = createHttpParams();
-        final ThreadSafeClientConnManager tccm = new ThreadSafeClientConnManager(httpParams, supportedSchemes);
-        DefaultHttpClient client = new DefaultHttpClient(tccm, httpParams);
+    private DefaultHttpClient createHttpClient() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, KeyManagementException {
+        HttpParams httpParams = createHttpParams();
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        trustStore.load(null, null);
+        SSLSocketFactory sf = new SSLSocketFactoryEx(trustStore);
+        sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        SchemeRegistry schReg = new SchemeRegistry();
+        schReg.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        schReg.register(new Scheme("https", sf, 443));
+        ClientConnectionManager conManager = new ThreadSafeClientConnManager(httpParams, schReg);
+
+        DefaultHttpClient client = new DefaultHttpClient(conManager, httpParams);
         client.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
         return client;
     }
@@ -315,11 +361,9 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             throw new IllegalArgumentException("Request url MUST NOT be null");
         }
         if (TextUtils.isEmpty(method)) {
-            throw new IllegalArgumentException(
-                                                  "Request method MUST NOT be null");
+            throw new IllegalArgumentException("Request method MUST NOT be null");
         } else {
-            if (!method.equalsIgnoreCase(HTTP_REQUEST_METHOD_GET)
-                    && !method.equalsIgnoreCase(HTTP_REQUEST_METHOD_POST)) {
+            if (!method.equalsIgnoreCase(HTTP_REQUEST_METHOD_GET) && !method.equalsIgnoreCase(HTTP_REQUEST_METHOD_POST)) {
                 throw new IllegalArgumentException("Only support GET and POST");
             }
         }

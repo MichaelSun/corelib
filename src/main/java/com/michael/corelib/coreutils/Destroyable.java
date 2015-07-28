@@ -1,6 +1,3 @@
-/**
- * Destroyable.java
- */
 package com.michael.corelib.coreutils;
 
 /**

@@ -1,6 +1,3 @@
-/**
- * Environment.java
- */
 package com.michael.corelib.coreutils;
 
 import android.app.ActivityManager;
