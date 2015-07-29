@@ -27,6 +27,8 @@ import java.util.List;
 
 public abstract class ResponseBase {
 
+	public String originJsonString;
+
 	/**
 	 * 
 	 * print fields in response bean

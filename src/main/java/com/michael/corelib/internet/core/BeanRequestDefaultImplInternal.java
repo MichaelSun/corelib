@@ -154,20 +154,24 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
             if (request.isStringRawResponse() || (request.getGenericType() == String.class)) {
                 return (T) response;
             } else {
-                boolean isJsonObject = true;
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-                } catch (JSONException e) {
-                    isJsonObject = false;
-                    e.printStackTrace();
-                }
-                if (!isJsonObject) {
-                    Log.e("BeanRequestInternal", "return Json data is JsonArray without key");
-                    response = "{\"data\":" + response + "}";
-                    Log.e("BeanRequestInternal", "NOW JSON RET = " + response);
-                }
+//                boolean isJsonObject = true;
+//                try {
+//                    JSONObject jsonObject = new JSONObject(response);
+//                } catch (JSONException e) {
+//                    isJsonObject = false;
+//                    e.printStackTrace();
+//                }
+//                if (!isJsonObject) {
+//                    Log.e("BeanRequestInternal", "return Json data is JsonArray without key");
+//                    response = "{\"data\":" + response + "}";
+//                    Log.e("BeanRequestInternal", "NOW JSON RET = " + response);
+//                }
 
                 ret = JsonUtils.parse(response, request.getGenericType());
+
+                if (ret != null && ret instanceof ResponseBase) {
+                    ((ResponseBase) ret).originJsonString = response;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
