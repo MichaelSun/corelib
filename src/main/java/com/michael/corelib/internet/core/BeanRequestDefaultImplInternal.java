@@ -2,7 +2,6 @@ package com.michael.corelib.internet.core;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import com.michael.corelib.extend.defaultNetworkImpl.MultipartHttpEntity;
 import com.michael.corelib.internet.NetworkLog;
 import com.michael.corelib.internet.core.util.InternetStringUtils;
@@ -12,8 +11,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -108,7 +105,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         }
 
         HttpEntity entity = null;
-        if (contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_TEXT_PLAIN)) {
+        if (!contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_MUTIPART)) {
             if (httpMethod.equals("POST")) {
                 List<NameValuePair> paramList = convertBundleToNVPair(baseParams);
                 if (paramList != null) {
