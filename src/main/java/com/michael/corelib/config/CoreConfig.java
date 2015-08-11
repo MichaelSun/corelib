@@ -23,7 +23,7 @@ public class CoreConfig {
 
     public static boolean CORE_LIB_INIT;
 
-    private static DebugLog DEFAULT_DEBUG_LOG = CoreLog.getInstance().getDebugLogByFileName("");
+    private static DebugLog DEFAULT_DEBUG_LOG;
 
     /**
      * 初始化corelib
@@ -44,9 +44,9 @@ public class CoreConfig {
             DEBUG = debug;
         }
 
+        DEFAULT_DEBUG_LOG = CoreLog.getInstance().getDebugLogByFileName("");
         //初始化SingleManager
         SingleInstanceManager.getInstance().init(context);
-
         LOGD("[[CoreConfig::init]] ROOT_DIR = " + ROOT_DIR);
 
         CORE_LIB_INIT = true;
@@ -54,18 +54,30 @@ public class CoreConfig {
 
     public static void LOGD(String msg) {
         if (DEBUG) {
+            if (DEFAULT_DEBUG_LOG == null) {
+                throw new IllegalArgumentException("please invoke CoreConfig.init before LOGD");
+            }
+
             DEFAULT_DEBUG_LOG.d("", msg);
         }
     }
 
     public static void LOGD(String tag, String msg) {
         if (DEBUG) {
+            if (DEFAULT_DEBUG_LOG == null) {
+                throw new IllegalArgumentException("please invoke CoreConfig.init before LOGD");
+            }
+
             DEFAULT_DEBUG_LOG.d(tag, msg);
         }
     }
 
     public static void LOGD(String msg, Throwable e) {
         if (DEBUG) {
+            if (DEFAULT_DEBUG_LOG == null) {
+                throw new IllegalArgumentException("please invoke CoreConfig.init before LOGD");
+            }
+
             DEFAULT_DEBUG_LOG.d("", msg, e);
         }
     }

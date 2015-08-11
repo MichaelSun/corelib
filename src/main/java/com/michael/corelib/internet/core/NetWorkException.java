@@ -2,7 +2,9 @@ package com.michael.corelib.internet.core;
 
 public class NetWorkException extends Exception {
 
-    //本地网络错误码全部为负数
+    private static final long serialVersionUID = 1L;
+
+    /** 本地网络错误码全部为负数 */
     public static final int NETWORK_NOT_AVILABLE = -1;
     public static final int SERVER_ERROR = -2;
     public static final int NETWORK_ERROR = -3;
@@ -14,40 +16,30 @@ public class NetWorkException extends Exception {
     public static final int REQUEST_NULL = -9;
     public static final int RESPONSE_PARSE_ERROR = -10;
     
-    private static final long serialVersionUID = 1L;
-    
-    private int mExceptionCode;
-    private String mDeveloperExceptionMsg;
-    private String mUserExceptionMsg;
-    
-    public NetWorkException(String exceptionMsg) {
-        super(exceptionMsg);
-        mDeveloperExceptionMsg = exceptionMsg;
+    public final int exceptionCode;
+    public final String developerExceptionMsg;
+    public final String userExceptionMsg;
+
+    public final NetworkResponse networkResponse;
+
+    public NetWorkException(int code, String msg, String description, NetworkResponse response) {
+        exceptionCode = code;
+        developerExceptionMsg = msg;
+        userExceptionMsg = description;
+        networkResponse = response;
     }
-    
-    public NetWorkException(int code, String msg, String description) {
-        super(msg);
-        mExceptionCode = code;
-        mDeveloperExceptionMsg = msg;
-        mUserExceptionMsg = description;
+
+    public NetWorkException(String msg) {
+        this(0, msg, null, null);
     }
-    
-    public int getErrorCode() {
-        return mExceptionCode;
-    }
-    
-    public String getDeveloperExceptionMsg() {
-        return mDeveloperExceptionMsg;
-    }
-    
-    public String getUserExceptionMsg() {
-        return mUserExceptionMsg;
-    }
-    
+
     @Override
     public String toString() {
-        return "NetWorkException [mExceptionCode=" + mExceptionCode + ", mExceptionMsg=" + mDeveloperExceptionMsg
-                + ", mExceptionDescription=" + mUserExceptionMsg + "]";
+        return "NetWorkException{" +
+                   "exceptionCode=" + exceptionCode +
+                   ", developerExceptionMsg='" + developerExceptionMsg + '\'' +
+                   ", userExceptionMsg='" + userExceptionMsg + '\'' +
+                   ", networkResponse=" + networkResponse +
+                   "} " + super.toString();
     }
-    
 }

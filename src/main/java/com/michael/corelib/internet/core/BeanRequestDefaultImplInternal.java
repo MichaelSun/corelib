@@ -2,16 +2,18 @@ package com.michael.corelib.internet.core;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import com.michael.corelib.extend.defaultNetworkImpl.MultipartHttpEntity;
 import com.michael.corelib.internet.NetworkLog;
 import com.michael.corelib.internet.core.util.InternetStringUtils;
 import com.michael.corelib.internet.core.util.JsonUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -57,11 +59,11 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         }
 
         if (request == null) {
-            throw new NetWorkException(NetWorkException.REQUEST_NULL, "Request can't be NUll", null);
+            throw new NetWorkException(NetWorkException.REQUEST_NULL, "Request can't be NUll", null, null);
         }
 
         if (!mHttpClientInterface.isNetworkAvailable()) {
-            throw new NetWorkException(NetWorkException.NETWORK_NOT_AVILABLE, "网络连接错误，请检查您的网络", null);
+            throw new NetWorkException(NetWorkException.NETWORK_NOT_AVILABLE, "NetWork error, not wifi or mobile", null, null);
         }
 
         RequestEntity requestEntity = request.getRequestEntity();
@@ -69,22 +71,23 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         Bundle headerBundle = requestEntity.getHeaderParams();
 
         if (baseParams == null) {
-            throw new NetWorkException(NetWorkException.PARAM_EMPTY, "网络请求参数列表不能为空", null);
+            throw new NetWorkException(NetWorkException.PARAM_EMPTY, "Params can't be Null", null, null);
         }
 
+        //make Http scheme url
         String api_url = baseParams.getString(KEY_METHOD);
         baseParams.remove(KEY_METHOD);
-        String httpMethod = baseParams.getString(KEY_HTTP_METHOD);
-        baseParams.remove(KEY_HTTP_METHOD);
         if (baseParams.containsKey(KEY_METHOD_EXT)) {
             String ext = baseParams.getString(KEY_METHOD_EXT);
             api_url = api_url + "/" + ext;
             baseParams.remove(KEY_METHOD_EXT);
         }
 
+        String httpMethod = baseParams.getString(KEY_HTTP_METHOD);
+        baseParams.remove(KEY_HTTP_METHOD);
         String contentType = requestEntity.getContentType();
         if (contentType == null) {
-            throw new NetWorkException(NetWorkException.MISS_CONTENT, "Content Type MUST be specified", null);
+            throw new NetWorkException(NetWorkException.MISS_CONTENT, "Content type must be specified", null, null);
         }
 
         if (DEBUG) {
@@ -94,14 +97,14 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                     param.append("|    ").append(key).append(" : ").append(baseParams.get(key)).append("\n");
                 }
 
-                param.append("|    ======= header params ========").append("\n").append("|    ");
+                param.append("|    <<<<<<<<<< header params >>>>>>>>>>").append("\n");
                 for (String key : headerBundle.keySet()) {
                     param.append("|    ").append(key).append(" : ").append(headerBundle.get(key)).append("\n");
                 }
             }
 
-            NetworkLog.LOGD("\n\n//***\n| [[request::" + request + "]] \n" + "| RestAPI URL = " + api_url
-                    + "\n| after getSig bundle params is = \n" + param + " \n\\\\***\n");
+            NetworkLog.LOGD("\n\n//*****\n| [[request::" + request + "]] \n" + "| RestAPI URL = " + api_url
+                    + "\n| Params is = \n" + param + " \n\\\\*****\n");
         }
 
         HttpEntity entity = null;
@@ -110,9 +113,31 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                 List<NameValuePair> paramList = convertBundleToNVPair(baseParams);
                 if (paramList != null) {
                     try {
-                        entity = new UrlEncodedFormEntity(paramList, HTTP.UTF_8);
+                        Collections.sort(paramList, new Comparator<NameValuePair>() {
+                            @Override
+                            public int compare(NameValuePair p1, NameValuePair p2) {
+                                return p1.getName().compareTo(p2.getName());
+                            }
+                        });
+
+                        StringBuilder paramSb = new StringBuilder();
+                        for (NameValuePair pair : paramList) {
+                            paramSb.append(pair.getName()).append("=").append(pair.getValue()).append("&");
+                        }
+                        String data = null;
+                        if (paramSb.length() > 0) {
+                            data = paramSb.subSequence(0, paramSb.length() - 1).toString();
+                        }
+
+//                        if (DEBUG) {
+//                            NetworkLog.LOGD("[[request]] POST data : " + data);
+//                        }
+
+                        if (!TextUtils.isEmpty(data)) {
+                            entity = new StringEntity(data);
+                        }
                     } catch (UnsupportedEncodingException e) {
-                        throw new NetWorkException(NetWorkException.ENCODE_HTTP_PARAMS_ERROR, "Unable to encode http parameters", null);
+                        throw new NetWorkException(NetWorkException.ENCODE_HTTP_PARAMS_ERROR, "Unable to encode http parameters", null, null);
                     }
                 }
             } else if (httpMethod.equals("GET")) {
@@ -122,28 +147,43 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                     sb.append(key).append("=").append(baseParams.getString(key)).append("&");
                 }
                 api_url = sb.substring(0, sb.length() - 1);
-                if (DEBUG) {
-                    NetworkLog.LOGD("\n\n//***\n| GET url : " + api_url + "\n\\\\***\n");
-                }
+//                if (DEBUG) {
+//                    NetworkLog.LOGD("\n\n//***\n| GET url : " + api_url + "\n\\\\***\n");
+//                }
             }
         } else if (contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_MUTIPART)) {
             requestEntity.setBasicParams(baseParams);
             entity = new MultipartHttpEntity(requestEntity);
         }
 
-        String response = null;
+        HttpResponse httpResponse = null;
         if ("POST".equals(httpMethod)) {
-            response = mHttpClientInterface.postResource(String.class, api_url, httpMethod, entity, convertBundleToNVPair(headerBundle));
+            httpResponse = mHttpClientInterface.postResource(HttpResponse.class, api_url, httpMethod, entity, convertBundleToNVPair(headerBundle));
         } else if ("GET".equals(httpMethod)) {
-            response = mHttpClientInterface.getResource(String.class, api_url, httpMethod, entity, convertBundleToNVPair(headerBundle));
+            httpResponse = mHttpClientInterface.getResource(HttpResponse.class, api_url, httpMethod, entity, convertBundleToNVPair(headerBundle));
         } else {
-            throw new IllegalArgumentException("Lib Not Support this HTTP Method : " + httpMethod);
+            throw new IllegalArgumentException("Lib not support this http method : " + httpMethod);
+        }
+
+        if (httpResponse == null) {
+            throw new NetWorkException(NetWorkException.SERVER_ERROR, "Server response is null", null, null);
+        }
+
+        String response = null;
+        if (httpResponse.getStatusLine() != null
+                && String.valueOf(httpResponse.getStatusLine().getStatusCode()).startsWith("2")) {
+            try {
+                response = InternetStringUtils.unGzipBytesToString(httpResponse.getEntity().getContent()).trim();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         dumpResponse(request.getClass().getName(), response);
 
         if (response == null) {
-            throw new NetWorkException(NetWorkException.SERVER_ERROR, "服务器错误，请稍后重试", null);
+            NetworkResponse networkResponse = new NetworkResponse(httpResponse.getStatusLine().getStatusCode(), null, httpResponse.getAllHeaders());
+            throw new NetWorkException(httpResponse.getStatusLine().getStatusCode(), "Connect to server error", null, networkResponse);
         }
 
         T ret = null;
@@ -151,23 +191,11 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
             if (request.isStringRawResponse() || (request.getGenericType() == String.class)) {
                 return (T) response;
             } else {
-//                boolean isJsonObject = true;
-//                try {
-//                    JSONObject jsonObject = new JSONObject(response);
-//                } catch (JSONException e) {
-//                    isJsonObject = false;
-//                    e.printStackTrace();
-//                }
-//                if (!isJsonObject) {
-//                    Log.e("BeanRequestInternal", "return Json data is JsonArray without key");
-//                    response = "{\"data\":" + response + "}";
-//                    Log.e("BeanRequestInternal", "NOW JSON RET = " + response);
-//                }
-
                 ret = JsonUtils.parse(response, request.getGenericType());
 
                 if (ret != null && ret instanceof ResponseBase) {
-                    ((ResponseBase) ret).originJsonString = response;
+                    NetworkResponse info = new NetworkResponse(httpResponse.getStatusLine().getStatusCode(), response, httpResponse.getAllHeaders());
+                    ((ResponseBase) ret).networkResponse = info;
                 }
             }
         } catch (Exception e) {
@@ -239,10 +267,10 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
             long endTime = System.currentTimeMillis();
             StringBuilder sb = new StringBuilder(1024);
             sb.append("\n\n")
-                .append("//***\n")
+                .append("//*****\n")
                 .append("| ------------- begin response ------------\n")
                 .append("|\n")
-                .append("| [[request::" + request + "]] raw response String = ");
+                .append("| [[Request::" + request + "]] raw response string = ");
             NetworkLog.LOGD(sb.toString());
             sb.setLength(0);
             if (response != null) {
@@ -269,7 +297,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                 index = index + step;
             } while (index < sb.length());
             sb.setLength(0);
-            sb.append("|\n").append("| ------------- end response ------------\n").append("\\\\***");
+            sb.append("|\n").append("| ------------- end response ------------\n").append("\\\\*****\n");
             NetworkLog.LOGD(sb.toString());
         }
     }

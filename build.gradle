@@ -43,3 +43,15 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.2.0'
 }
 
+task clearJar(type: Delete) {
+   delete 'build/outputs/corelib.jar'
+}
+
+task makeJar(type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('build/outputs/')
+    include('classes.jar')
+    rename ('classes.jar', 'corelib.jar')
+}
+
+makeJar.dependsOn(clearJar, build)

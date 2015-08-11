@@ -17,6 +17,7 @@
 package com.michael.corelib.internet.core;
 
 import com.michael.corelib.internet.core.json.JsonProperty;
+import org.apache.http.Header;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -27,7 +28,7 @@ import java.util.List;
 
 public abstract class ResponseBase {
 
-	public String originJsonString;
+	public NetworkResponse networkResponse;
 
 	/**
 	 * 

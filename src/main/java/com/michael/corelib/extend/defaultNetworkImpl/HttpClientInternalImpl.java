@@ -128,6 +128,13 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             } catch (NetWorkException e) {
                 e.printStackTrace();
             }
+        } else if (retResourceType == HttpResponse.class) {
+            preExecuteHttpRequest();
+            try {
+                return (T) httpClient.execute(requestBase);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             throw new RuntimeException("Unknown resoureType :" + retResourceType);
         }
@@ -192,6 +199,13 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             } catch (NetWorkException e) {
                 e.printStackTrace();
             }
+        } else if (retResourceType == HttpResponse.class) {
+            preExecuteHttpRequest();
+            try {
+                return (T) httpClient.execute(requestBase);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             throw new RuntimeException("Unknown resoureType :" + retResourceType);
         }
@@ -233,7 +247,9 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         public String handleResponse(HttpResponse response)
             throws ClientProtocolException, IOException {
             String r = null;
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            if (response != null
+                    && response.getStatusLine() != null
+                    && String.valueOf(response.getStatusLine().getStatusCode()).startsWith("2")) {
                 try {
                     r = InternetStringUtils.unGzipBytesToString(response.getEntity().getContent()).trim();
                 } catch (IOException e) {
@@ -384,7 +400,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             return httpClientByte.execute(httpRequest, handler);
         } catch (Exception e) {
             onExecuteException(httpRequest);
-            throw new NetWorkException(NetWorkException.NETWORK_ERROR, "网络连接错误", e.toString());
+            throw new NetWorkException(NetWorkException.NETWORK_ERROR, "Network connect error", e.toString(), null);
         }
     }
 
@@ -416,7 +432,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             return httpClientByte.execute(httpRequest, handler);
         } catch (Exception e) {
             onExecuteException(httpRequest);
-            throw new NetWorkException(NetWorkException.NETWORK_ERROR, "网络连接错误", e.toString());
+            throw new NetWorkException(NetWorkException.NETWORK_ERROR, "Network connect error", e.toString(), null);
         }
     }
 
@@ -428,7 +444,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             return httpClient.execute(httpRequest, handler);
         } catch (Exception e) {
             onExecuteException(httpRequest);
-            throw new NetWorkException(NetWorkException.NETWORK_ERROR, "网络连接错误", e.toString());
+            throw new NetWorkException(NetWorkException.NETWORK_ERROR, "Network connect error", e.toString(), null);
         }
     }
 }

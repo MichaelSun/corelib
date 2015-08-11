@@ -3,6 +3,7 @@ package com.michael.corelib.internet;
 import android.content.Context;
 import com.michael.corelib.coreutils.CustomThreadPool;
 import com.michael.corelib.internet.core.NetWorkException;
+import com.michael.corelib.internet.core.NetworkResponse;
 import com.michael.corelib.internet.core.RequestBase;
 import org.apache.http.NameValuePair;
 
@@ -18,7 +19,7 @@ public class InternetClient {
 
         void onSuccess(RequestBase<T> request, T ret);
 
-        void onFailed(RequestBase<T> request);
+        void onFailed(RequestBase<T> request, NetworkResponse httpResponseCode);
     }
 
     private Context mContext;
@@ -45,6 +46,7 @@ public class InternetClient {
         CustomThreadPool.asyncWork(new Runnable() {
             @Override
             public void run() {
+                NetworkResponse networkResponse = null;
                 try {
                     T ret = InternetUtilInternal.request(mContext, request);
                     if (ret != null && callback != null) {
@@ -52,11 +54,15 @@ public class InternetClient {
                     }
                     return;
                 } catch (NetWorkException e) {
+                    if (NetworkLog.DEBUG) {
+                        NetworkLog.LOGD(e.toString());
+                    }
+                    networkResponse = e.networkResponse;
                     e.printStackTrace();
                 }
 
                 if (callback != null) {
-                    callback.onFailed(request);
+                    callback.onFailed(request, networkResponse);
                 }
             }
         });
