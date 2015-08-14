@@ -7,7 +7,7 @@ import com.michael.corelib.config.CoreConfig;
  */
 public class NetworkLog {
 
-    public static final boolean DEBUG = CoreConfig.DEBUG;
+    public static boolean DEBUG = CoreConfig.DEBUG;
 
     public static final int SIG_PARAM_MAX_LENGTH = 5000;
 

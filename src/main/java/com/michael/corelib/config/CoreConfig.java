@@ -5,6 +5,7 @@ import android.os.Environment;
 import com.michael.corelib.corelog.CoreLog;
 import com.michael.corelib.corelog.DebugLog;
 import com.michael.corelib.coreutils.SingleInstanceManager;
+import com.michael.corelib.internet.NetworkLog;
 
 import java.io.File;
 
@@ -47,6 +48,7 @@ public class CoreConfig {
         DEFAULT_DEBUG_LOG = CoreLog.getInstance().getDebugLogByFileName("");
         //初始化SingleManager
         SingleInstanceManager.getInstance().init(context);
+        NetworkLog.DEBUG = DEBUG;
         LOGD("[[CoreConfig::init]] ROOT_DIR = " + ROOT_DIR);
 
         CORE_LIB_INIT = true;
