@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CustomThreadPool implements Destroyable, SingleInstanceManager.SingleInstanceBase {
-    private static final String TAG = "RRThreadPool";
+    private static final String TAG = "CustomThreadPool";
 
     private static final boolean USING_CUSTOM_THREADPOOL = true;
 
