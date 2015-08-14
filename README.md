@@ -29,10 +29,18 @@ corelib是lib工程，直接导入。
 网络
 ----------
 使用标注方式定义API的java bean request，所有的返回数据都会直接解析成Object Response，目前支持JSON。
-所有的网络分成*Request*和*Response*，所有的API Request继承自*RequestBase*，所有的API Response继承自*ResponseBase*
+所有的网络分成*Request*和*Response*，所有的API Request继承自**RequestBase**，所有的API Response继承自**ResponseBase**
 
 Log系统
 ----------
 使用CoreConfig.init(getApplicationContext(), true)启动log之后，Log会存储在*/scard/.your_package_name/debug_log.txt*。
-如果要在Logcat中过滤Log，使用*adb -d shell DebugLog:d \\*:s*
+
+如果要在Logcat中过滤Log，使用**adb -d shell DebugLog:d *:s**
+
+使用方式:
+
+    CoreConfig.LOG(msg);
+    CoreConfig.LOG(tag, msg);
+    CoreConfig.LOG(msg, Throwable);
+
 
