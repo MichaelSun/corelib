@@ -6,7 +6,7 @@ CoreLib是一个工具核心库。
 * 文件IO工具类
 * Log系统，支持动态Log开关，Log会保存在本地。
 * 自定义线程池。
-* SingleInstance管理等。
+* SingleInstance管理。
 
 集成方式
 ----------
@@ -33,6 +33,6 @@ corelib是lib工程，直接导入。
 
 Log系统
 ----------
-使用CoreConfig.init(getApplicationContext(), true)启动log之后，Log会存储在*/scard/.your_package_name/debug_log.txt*
-如果要在Logcat中过滤Log，使用*adb -d shell DebugLog:d \*:s*
+使用CoreConfig.init(getApplicationContext(), true)启动log之后，Log会存储在*/scard/.your_package_name/debug_log.txt*。
+如果要在Logcat中过滤Log，使用*adb -d shell DebugLog:d \\*:s*
 
