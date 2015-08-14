@@ -43,4 +43,11 @@ Log系统
     CoreConfig.LOG(tag, msg);
     CoreConfig.LOG(msg, Throwable);
 
+Proguard配置
+-----------
+    -keep class com.michael.corelib.** {*;}
+
+    -keep class * extends com.michael.corelib.internet.core.RequestBase { *; }
+    -keep class * extends com.michael.corelib.internet.core.ResponseBase { *; }
+
 
