@@ -646,7 +646,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
         INPUT_STREAM_CACHE_PATH = SubDirPathManager.tryToFetchPath(context, "stream_cache");
         DOWNLOADED_FILE_DIR = SubDirPathManager.tryToFetchPath(context, "filedownload");
         mContext = context.getApplicationContext();
-        mRequestList = new ArrayList<>();
+        mRequestList = new ArrayList<DownloadRequest>();
         bIsStop = false;
         mKeepAlive = DEFAULT_KEEPALIVE;
     }

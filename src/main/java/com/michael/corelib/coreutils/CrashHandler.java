@@ -27,7 +27,7 @@ public final class CrashHandler implements UncaughtExceptionHandler {
     private UncaughtExceptionHandler mDefaultHandler;
     private static CrashHandler INSTANCE = new CrashHandler();
     private Context mContext;
-    private Map<String, String> infos = new HashMap<>();
+    private Map<String, String> infos = new HashMap<String, String>();
     private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
     private CrashHandler() {

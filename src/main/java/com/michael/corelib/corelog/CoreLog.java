@@ -11,7 +11,7 @@ public class CoreLog {
 
     private static CoreLog gCoreLog = new CoreLog();
 
-    private HashMap<String, DebugLog> mDebugLogMap = new HashMap<>();
+    private HashMap<String, DebugLog> mDebugLogMap = new HashMap<String, DebugLog>();
 
     public static final CoreLog getInstance() {
         return gCoreLog;
