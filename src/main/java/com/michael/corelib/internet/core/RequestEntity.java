@@ -10,6 +10,10 @@ public class RequestEntity {
 	public static final String REQUEST_CONTENT_TYPE_TEXT_PLAIN = "text/plain";
 	
 	public static final String REQUEST_CONTENT_TYPE_MUTIPART = "multipart/form-data";
+
+	public static final String REQUEST_CONTENT_TYPE_JSON = "application/json";
+
+	public static final String HEADER_KEY_CONTENT_TYPE = "Content-Type";
 	
 	private Bundle basicParams;
 	

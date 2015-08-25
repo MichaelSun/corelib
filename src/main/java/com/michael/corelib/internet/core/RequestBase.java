@@ -45,9 +45,13 @@ public abstract class RequestBase<T> {
             return mRequestEntity;
         }
         mRequestEntity = new RequestEntity();
+        Bundle bundle = getHeaderParams();
         mRequestEntity.setBasicParams(getParams());
-        mRequestEntity.setHeaderParams(getHeaderParams());
+        mRequestEntity.setHeaderParams(bundle);
         mRequestEntity.setContentType(RequestEntity.REQUEST_CONTENT_TYPE_TEXT_PLAIN);
+        if (bundle != null && bundle.containsKey(RequestEntity.HEADER_KEY_CONTENT_TYPE)) {
+            mRequestEntity.setContentType(bundle.getString(RequestEntity.HEADER_KEY_CONTENT_TYPE));
+        }
         return mRequestEntity;
     }
 
