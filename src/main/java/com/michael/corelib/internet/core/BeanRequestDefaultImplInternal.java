@@ -12,6 +12,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -97,47 +98,54 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                     param.append("|    ").append(key).append(" : ").append(baseParams.get(key)).append("\n");
                 }
 
-                param.append("|    <<<<<<<<<< header params >>>>>>>>>>").append("\n");
+                param.append("| HTTP Method = ").append("\n");
+                param.append("|    ").append(KEY_HTTP_METHOD).append(" : ").append(httpMethod).append("\n");
+
+                param.append("| header params = ").append("\n");
                 for (String key : headerBundle.keySet()) {
                     param.append("|    ").append(key).append(" : ").append(headerBundle.get(key)).append("\n");
                 }
             }
 
             NetworkLog.LOGD("\n\n//*****\n| [[request::" + request + "]] \n" + "| RestAPI URL = " + api_url
-                    + "\n| Params is = \n" + param + " \n\\\\*****\n");
+                                + "\n| Params is = \n" + param + " \n\\\\*****\n");
         }
 
         HttpEntity entity = null;
         if (!contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_MUTIPART)) {
             if (httpMethod.equals("POST")) {
-                List<NameValuePair> paramList = convertBundleToNVPair(baseParams);
-                if (paramList != null) {
+                if (contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_JSON)) {
                     try {
-                        Collections.sort(paramList, new Comparator<NameValuePair>() {
-                            @Override
-                            public int compare(NameValuePair p1, NameValuePair p2) {
-                                return p1.getName().compareTo(p2.getName());
-                            }
-                        });
-
-                        StringBuilder paramSb = new StringBuilder();
-                        for (NameValuePair pair : paramList) {
-                            paramSb.append(pair.getName()).append("=").append(pair.getValue()).append("&");
-                        }
-                        String data = null;
-                        if (paramSb.length() > 0) {
-                            data = paramSb.subSequence(0, paramSb.length() - 1).toString();
-                        }
-
-//                        if (DEBUG) {
-//                            NetworkLog.LOGD("[[request]] POST data : " + data);
-//                        }
-
-                        if (!TextUtils.isEmpty(data)) {
-                            entity = new StringEntity(data);
-                        }
+                        entity = new StringEntity(convertNVPairToJson(baseParams), HTTP.UTF_8);
                     } catch (UnsupportedEncodingException e) {
-                        throw new NetWorkException(NetWorkException.ENCODE_HTTP_PARAMS_ERROR, "Unable to encode http parameters", null, null);
+                        e.printStackTrace();
+                    }
+                } else {
+                    List<NameValuePair> paramList = convertBundleToNVPair(baseParams);
+                    if (paramList != null) {
+                        try {
+                            Collections.sort(paramList, new Comparator<NameValuePair>() {
+                                @Override
+                                public int compare(NameValuePair p1, NameValuePair p2) {
+                                    return p1.getName().compareTo(p2.getName());
+                                }
+                            });
+
+                            StringBuilder paramSb = new StringBuilder();
+                            for (NameValuePair pair : paramList) {
+                                paramSb.append(pair.getName()).append("=").append(pair.getValue()).append("&");
+                            }
+                            String data = null;
+                            if (paramSb.length() > 0) {
+                                data = paramSb.subSequence(0, paramSb.length() - 1).toString();
+                            }
+
+                            if (!TextUtils.isEmpty(data)) {
+                                entity = new StringEntity(data);
+                            }
+                        } catch (UnsupportedEncodingException e) {
+                            throw new NetWorkException(NetWorkException.ENCODE_HTTP_PARAMS_ERROR, "Unable to encode http parameters", null, null);
+                        }
                     }
                 }
             } else if (httpMethod.equals("GET")) {
@@ -147,9 +155,6 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                     sb.append(key).append("=").append(baseParams.getString(key)).append("&");
                 }
                 api_url = sb.substring(0, sb.length() - 1);
-//                if (DEBUG) {
-//                    NetworkLog.LOGD("\n\n//***\n| GET url : " + api_url + "\n\\\\***\n");
-//                }
             }
         } else if (contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_MUTIPART)) {
             requestEntity.setBasicParams(baseParams);
@@ -203,6 +208,30 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         }
 
         return ret;
+    }
+
+    private String convertNVPairToJson(Bundle bundle) {
+        if (bundle == null) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+
+        ArrayList<NameValuePair> list = new ArrayList<NameValuePair>();
+        Set<String> keySet = bundle.keySet();
+        for (String key : keySet) {
+            sb.append("\"").append(key).append("\"").append(":")
+                .append("\"").append(bundle.get(key)).append("\"").append(",");
+        }
+
+        String str = sb.substring(0, sb.lastIndexOf(",")) + "}";
+
+        if (DEBUG) {
+            NetworkLog.LOGD("[[BeanRequestDefaultImplInternal::convertNVPairToJson]] convertNVPairToJson data : " + str);
+        }
+
+        return str;
     }
 
     @Override
