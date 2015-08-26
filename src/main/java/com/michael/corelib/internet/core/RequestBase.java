@@ -69,7 +69,7 @@ public abstract class RequestBase<T> {
 
     protected Bundle getParams() throws NetWorkException {
         Class<?> c = this.getClass();
-        ArrayList<Class<?>> classList = new ArrayList<>();
+        ArrayList<Class<?>> classList = new ArrayList<Class<?>>();
         while (c != RequestBase.class) {
             classList.add(0, c);
             c = c.getSuperclass();
@@ -99,7 +99,7 @@ public abstract class RequestBase<T> {
 
     protected Bundle getHeaderParams() throws NetWorkException {
         Class<?> c = this.getClass();
-        ArrayList<Class<?>> classList = new ArrayList<>();
+        ArrayList<Class<?>> classList = new ArrayList<Class<?>>();
         while (c != RequestBase.class) {
             classList.add(0, c);
             c = c.getSuperclass();
