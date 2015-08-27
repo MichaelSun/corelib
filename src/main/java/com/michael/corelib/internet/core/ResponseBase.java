@@ -17,18 +17,120 @@
 package com.michael.corelib.internet.core;
 
 import com.michael.corelib.internet.core.json.JsonProperty;
-import org.apache.http.Header;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
 
 public abstract class ResponseBase {
 
 	public NetworkResponse networkResponse;
+
+    private static final String NEW_LINE = "\n";
+
+    private static final String DEFAULT_INDENT = "   ";
+    private static final String OBJECT_START = "{";
+    private static final String OBJECT_END = "}";
+    private static final String ARRRY_START = "[";
+    private static final String ARRAY_END = "]";
+    private static final String KEY_VALUE_SPLITOR = " : ";
+    private static final String END_OBJECT = ",";
+
+	public String toPrettyJSon() {
+		StringBuilder sb = new StringBuilder();
+        sb.append(NEW_LINE);
+        writeObjectPretty(sb, this, "");
+        sb.append(NEW_LINE);
+
+        return sb.toString();
+	}
+
+	private void writeObjectPretty(StringBuilder outSB, Object object, String indent) {
+        if (outSB == null) {
+            return;
+        }
+
+        if (object == null) {
+            outSB.append("null");
+            return;
+        }
+        outSB.append(OBJECT_START).append(NEW_LINE);
+        Class<?> c = object.getClass();
+        Field[] fields = c.getDeclaredFields();
+        for (Field field : fields) {
+            if (!field.isAnnotationPresent(JsonProperty.class)) {
+                continue;
+            }
+
+            field.setAccessible(true);
+            String key = field.getName();
+            try {
+                Class<?> type = field.getType();
+                if (type.isPrimitive() || type == String.class) {
+                    outSB.append(indent + DEFAULT_INDENT).append(key).append(KEY_VALUE_SPLITOR).append(String.valueOf(field.get(object))).append(END_OBJECT).append(NEW_LINE);
+                } else if (type.isArray()) {
+                    outSB.append(indent + DEFAULT_INDENT).append(key).append(KEY_VALUE_SPLITOR);
+                    writeArrayValuePretty(outSB, type, field.get(object), indent + DEFAULT_INDENT);
+                } else {
+                    outSB.append(indent + DEFAULT_INDENT).append(key).append(KEY_VALUE_SPLITOR);
+                    writeObjectPretty(outSB, field.get(object), indent + DEFAULT_INDENT);
+                    outSB.append(NEW_LINE);
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
+        }
+        outSB.append(indent).append(OBJECT_END);
+    }
+
+    private void writeArrayValuePretty(StringBuilder outSB, Class<?> arrayType, Object obj, String indent) {
+        if (arrayType == null || !arrayType.isArray() || obj == null) {
+            return;
+        }
+
+        int length = Array.getLength(obj);
+        if (length == 0) {
+            outSB.append("null").append(NEW_LINE);
+            return;
+        }
+        boolean isFristOne = true;
+        boolean isObjectArray = false;
+        outSB.append(ARRRY_START);
+        for (int i = 0 ; i < length ; i ++ ) {
+            Object item = Array.get(obj, i);
+            if (item.getClass().isPrimitive()
+                    || item.getClass() == String.class
+                    ||  item.getClass() == Integer.class
+                    ||  item.getClass() == Float.class
+                    ||  item.getClass() == Double.class
+                    ||  item.getClass() == Long.class) {
+                outSB.append(String.valueOf(item));
+            } else {
+                if (isFristOne) {
+                    isFristOne = false;
+                    outSB.append(NEW_LINE);
+                }
+                isObjectArray = true;
+                outSB.append(indent + DEFAULT_INDENT);
+                writeObjectPretty(outSB, item, indent + DEFAULT_INDENT);
+            }
+
+            if (i != (length -1)) {
+                outSB.append(END_OBJECT);
+            }
+            if (isObjectArray) {
+                outSB.append(NEW_LINE);
+            }
+        }
+
+        if (isObjectArray) {
+            outSB.append(indent);
+        }
+        outSB.append(ARRAY_END).append(NEW_LINE);
+    }
 
 	/**
 	 * 
@@ -40,6 +142,8 @@ public abstract class ResponseBase {
 	@SuppressWarnings("rawtypes")
 	public String toString (int level) {
 
+        return toPrettyJSon();
+/**
 		StringBuffer sb = new StringBuffer();
 		Class<?> c = this.getClass();
 		Field[] fields = c.getDeclaredFields();
@@ -58,7 +162,6 @@ public abstract class ResponseBase {
 			if (field.isAnnotationPresent(JsonProperty.class)) {
 				JsonProperty jsonProperty = field.getAnnotation(JsonProperty.class);
 				key = jsonProperty.value();
-				
 			}
 			
 			sb.append(prefix).append(key).append(" = ");
@@ -126,11 +229,11 @@ public abstract class ResponseBase {
 		sb.append(prefix + "--------------end element--------------\r\n");
 		
 		return sb.toString();
-	
+	*/
 	}
 
+    @Override
 	public String toString () {
 		return toString (0);
 	}
-
 }

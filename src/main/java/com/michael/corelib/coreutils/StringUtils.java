@@ -16,6 +16,8 @@
 
 package com.michael.corelib.coreutils;
 
+import com.michael.corelib.internet.NetworkLog;
+
 import java.io.*;
 import java.math.BigInteger;
 import java.net.URLDecoder;
@@ -371,6 +373,23 @@ public class StringUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void dumpLongStringToLogcat(String longString) {
+        int step = 2048;
+        int index = 0;
+        do {
+            if (index >= longString.length()) {
+                break;
+            } else {
+                if ((index + step) < longString.length()) {
+                    NetworkLog.LOGD(longString.substring(index, index + step));
+                } else {
+                    NetworkLog.LOGD(longString.substring(index, longString.length()));
+                }
+            }
+            index = index + step;
+        } while (index < longString.length());
     }
 
 }
