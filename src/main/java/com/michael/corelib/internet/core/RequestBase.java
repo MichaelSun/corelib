@@ -36,8 +36,14 @@ public abstract class RequestBase<T> {
 
     private boolean mStringRawResponse;
 
+    private boolean mShouldUrlEncodedParam;
+
     public boolean isStringRawResponse() {
         return mStringRawResponse;
+    }
+
+    public boolean isShouldUrlEncodedParam() {
+        return mShouldUrlEncodedParam;
     }
 
     public RequestEntity getRequestEntity() throws NetWorkException {
@@ -174,6 +180,11 @@ public abstract class RequestBase<T> {
 
         if (c.isAnnotationPresent(StringRawResponse.class)) {
             mStringRawResponse = true;
+        }
+
+        if (c.isAnnotationPresent(UrlEncodedParam.class)) {
+            UrlEncodedParam data = c.getAnnotation(UrlEncodedParam.class);
+            mShouldUrlEncodedParam = data.value();
         }
 
         // http Method name
