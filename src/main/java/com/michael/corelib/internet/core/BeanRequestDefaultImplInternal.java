@@ -31,7 +31,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
 
     private static BeanRequestDefaultImplInternal mInstance;
 
-    private HttpClientInterface mHttpClientInterface;
+    private HttpClientInterface mHttpClientImpl;
 
     private Context mContext;
 
@@ -49,8 +49,8 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
     }
 
     private BeanRequestDefaultImplInternal(Context context) {
-        mHttpClientInterface = HttpClientFactory.createHttpClientInterface(context);
         mContext = context;
+        mHttpClientImpl = HttpClientFactory.createHttpClientInterface(context);
     }
 
     @Override
@@ -64,7 +64,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
             throw new NetWorkException(NetWorkException.REQUEST_NULL, "Request can't be NUll", null, null);
         }
 
-        if (!mHttpClientInterface.isNetworkAvailable()) {
+        if (!mHttpClientImpl.isNetworkAvailable()) {
             throw new NetWorkException(NetWorkException.NETWORK_NOT_AVILABLE, "NetWork error, not wifi or mobile", null, null);
         }
 
@@ -152,9 +152,9 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
 
         HttpResponse httpResponse = null;
         if ("POST".equals(httpMethod)) {
-            httpResponse = mHttpClientInterface.postResource(HttpResponse.class, api_url, httpMethod, entity, convertBundleToNVPair(headerBundle));
+            httpResponse = mHttpClientImpl.postResource(HttpResponse.class, api_url, httpMethod, entity, convertBundleToNVPair(headerBundle), request.getCustomHttpParams());
         } else if ("GET".equals(httpMethod)) {
-            httpResponse = mHttpClientInterface.getResource(HttpResponse.class, api_url, httpMethod, entity, convertBundleToNVPair(headerBundle));
+            httpResponse = mHttpClientImpl.getResource(HttpResponse.class, api_url, httpMethod, entity, convertBundleToNVPair(headerBundle), request.getCustomHttpParams());
         } else {
             throw new IllegalArgumentException("Lib not support this http method : " + httpMethod);
         }

@@ -30,9 +30,25 @@ import java.util.ArrayList;
  */
 public abstract class RequestBase<T> {
 
+    public static final class CustomHttpParams {
+
+        public int connection_timeout = 20 * 1000;
+
+        public int so_timeout = 20 * 1000;
+
+        public int buffer_size = 8192;
+
+        public boolean tcpNoDelay = true;
+
+        public boolean staleCheckingEnabled = true;
+
+    }
+
     private static final boolean DEBUG = NetworkLog.DEBUG;
 
     private RequestEntity mRequestEntity;
+
+    private CustomHttpParams mCustomHttpParams;
 
     private boolean mStringRawResponse;
 
@@ -44,6 +60,14 @@ public abstract class RequestBase<T> {
 
     public boolean isShouldUrlEncodedParam() {
         return mShouldUrlEncodedParam;
+    }
+
+    final public void setCustomHttpParams(CustomHttpParams customHttpParams) {
+        mCustomHttpParams = customHttpParams;
+    }
+
+    CustomHttpParams getCustomHttpParams() {
+        return mCustomHttpParams;
     }
 
     public RequestEntity getRequestEntity() throws NetWorkException {

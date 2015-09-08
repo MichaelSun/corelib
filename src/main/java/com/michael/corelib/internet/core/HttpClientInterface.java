@@ -11,20 +11,15 @@ public interface HttpClientInterface {
 
     boolean init(Context context);
 
-    <T> T getResource(Class<T> retResourceType, String requestUrl, String method, HttpEntity entity, List<NameValuePair> headers)
+    <T> T getResource(Class<T> retResourceType, String requestUrl, String method, HttpEntity entity, List<NameValuePair> headers, RequestBase.CustomHttpParams customHttpParams)
         throws NetWorkException;
 
-    InputStream getInputStreamResource(String requestUrl, String method, HttpEntity entity, List<NameValuePair> headers)
+    InputStream getInputStreamResource(String requestUrl, String method, HttpEntity entity, List<NameValuePair> headers, RequestBase.CustomHttpParams customHttpParams)
         throws NetWorkException;
 
-    @Deprecated()
-    String getInputStreamResourceCallBackMode(String requestUrl, String method, HttpEntity entity, List<NameValuePair> headers)
-        throws NetWorkException;
-
-    <T> T postResource(Class<T> retResourceType, String requestUrl, String method, HttpEntity postEntity, List<NameValuePair> headers)
+    <T> T postResource(Class<T> retResourceType, String requestUrl, String method, HttpEntity postEntity, List<NameValuePair> headers, RequestBase.CustomHttpParams customHttpParams)
         throws NetWorkException;
 
     boolean isNetworkAvailable();
 
-    void setHttpReturnListener(HttpRequestHookListener l);
 }

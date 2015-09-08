@@ -4,9 +4,10 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
+import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.internet.core.HttpClientInterface;
-import com.michael.corelib.internet.core.HttpRequestHookListener;
 import com.michael.corelib.internet.core.NetWorkException;
+import com.michael.corelib.internet.core.RequestBase;
 import com.michael.corelib.internet.core.util.InternetStringUtils;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
@@ -44,21 +45,17 @@ import java.util.List;
  */
 public class HttpClientInternalImpl implements HttpClientInterface {
 
-    public static final String HTTP_REQUEST_METHOD_POST = "POST";
+    private static final String HTTP_REQUEST_METHOD_POST = "POST";
 
-    public static final String HTTP_REQUEST_METHOD_GET = "GET";
+    private static final String HTTP_REQUEST_METHOD_GET = "GET";
 
     private static final int TIMEOUT_DELAY = 20 * 1000;
 
-    private static final int HTTP_PORT = 80;
+    private HttpClient mHttpClient;
 
-    private HttpClient httpClient;
-
-    private HttpClient httpClientByte;
+    private HttpClient mHttpClientByte;
 
     private Context mContext;
-
-    private HttpRequestHookListener mHttpRequestHookListener;
 
     public HttpClientInternalImpl() {
     }
@@ -67,7 +64,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
     public boolean init(Context context) {
         mContext = context;
         try {
-            httpClient = createHttpClient();
+            mHttpClient = createHttpClient();
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (CertificateException e) {
@@ -82,7 +79,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             e.printStackTrace();
         }
         try {
-            httpClientByte = createHttpClientByte();
+            mHttpClientByte = createHttpClientByte();
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (CertificateException e) {
@@ -97,7 +94,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             e.printStackTrace();
         }
 
-        if (httpClient == null || httpClientByte == null) {
+        if (mHttpClient == null || mHttpClientByte == null) {
             return false;
         }
 
@@ -105,9 +102,14 @@ public class HttpClientInternalImpl implements HttpClientInterface {
     }
 
     @Override
-    public <T> T getResource(Class<T> retResourceType, String requestUrl, String method, HttpEntity entity, List<NameValuePair> headers) throws NetWorkException {
-        HttpRequestBase requestBase = createHttpRequest(requestUrl, method, entity);
+    public <T> T getResource(Class<T> retResourceType, String requestUrl, String method,
+                             HttpEntity entity, List<NameValuePair> headers, RequestBase.CustomHttpParams customHttpParams) throws NetWorkException {
+        if (customHttpParams != null) {
+            CoreConfig.LOGD("[[HttpClientInternalImpl::getResource]] customHttpParams make the http client use one time");
+            return new HttpClientOneTimeImpl(mContext).getResourceOneTime(retResourceType, requestUrl, method, entity, headers, customHttpParams);
+        }
 
+        HttpRequestBase requestBase = createHttpRequest(mHttpClient, mHttpClientByte, requestUrl, method, entity);
         // 增加指定的Header
         if (headers != null) {
             for (NameValuePair nvp : headers) {
@@ -131,7 +133,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         } else if (retResourceType == HttpResponse.class) {
             preExecuteHttpRequest();
             try {
-                return (T) httpClient.execute(requestBase);
+                return (T) mHttpClient.execute(requestBase);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -143,9 +145,14 @@ public class HttpClientInternalImpl implements HttpClientInterface {
     }
 
     @Override
-    public InputStream getInputStreamResource(String requestUrl, String method, HttpEntity entity, List<NameValuePair> headers) throws NetWorkException {
-        HttpRequestBase requestBase = createHttpRequest(requestUrl, method, entity);
+    public InputStream getInputStreamResource(String requestUrl, String method,
+                                              HttpEntity entity, List<NameValuePair> headers, RequestBase.CustomHttpParams customHttpParams) throws NetWorkException {
+        if (customHttpParams != null) {
+            CoreConfig.LOGD("[[HttpClientInternalImpl::getInputStreamResource]] customHttpParams make the http client use one time");
+            throw new RuntimeException("Not support this Now");
+        }
 
+        HttpRequestBase requestBase = createHttpRequest(mHttpClient, mHttpClientByte, requestUrl, method, entity);
         // 增加指定的Header
         if (headers != null) {
             for (NameValuePair nvp : headers) {
@@ -157,28 +164,14 @@ public class HttpClientInternalImpl implements HttpClientInterface {
     }
 
     @Override
-    public String getInputStreamResourceCallBackMode(String requestUrl, String method, HttpEntity entity, List<NameValuePair> headers) throws NetWorkException {
-        // 大文件下载，图片，语音等
-        HttpRequestBase requestBase = createHttpRequest(requestUrl, method, entity);
-
-        // 增加指定的Header
-        if (headers != null) {
-            for (NameValuePair nvp : headers) {
-                requestBase.addHeader(nvp.getName(), nvp.getValue());
-            }
+    public <T> T postResource(Class<T> retResourceType, String requestUrl, String method,
+                              HttpEntity postEntity, List<NameValuePair> headers, RequestBase.CustomHttpParams customHttpParams) throws NetWorkException {
+        if (customHttpParams != null) {
+            CoreConfig.LOGD("[[HttpClientInternalImpl::getResource]] customHttpParams make the http client use one time");
+            return new HttpClientOneTimeImpl(mContext).postResourceOneTime(retResourceType, requestUrl, method, postEntity, headers, customHttpParams);
         }
 
-        if (mHttpRequestHookListener != null) {
-            mHttpRequestHookListener.onCheckRequestHeaders(requestUrl, requestBase);
-        }
-
-        return getInputStreamResponse(requestBase, requestUrl);
-    }
-
-    @Override
-    public <T> T postResource(Class<T> retResourceType, String requestUrl, String method, HttpEntity postEntity, List<NameValuePair> headers) throws NetWorkException {
-        HttpRequestBase requestBase = createHttpRequest(requestUrl, method, postEntity);
-
+        HttpRequestBase requestBase = createHttpRequest(mHttpClient, mHttpClientByte, requestUrl, method, postEntity);
         // 增加指定的Header
         if (headers != null) {
             for (NameValuePair nvp : headers) {
@@ -202,7 +195,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         } else if (retResourceType == HttpResponse.class) {
             preExecuteHttpRequest();
             try {
-                return (T) httpClient.execute(requestBase);
+                return (T) mHttpClient.execute(requestBase);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -235,12 +228,6 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         return false;
     }
 
-    @Override
-    public void setHttpReturnListener(HttpRequestHookListener l) {
-        mHttpRequestHookListener = l;
-    }
-
-
     private class StringResponseHandler implements ResponseHandler<String> {
 
         @Override
@@ -270,35 +257,6 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             return data;
         }
 
-    }
-
-    private class StreamResponseHandler implements ResponseHandler<String> {
-
-        private String mRequestUrl;
-
-        StreamResponseHandler(String url) {
-            mRequestUrl = url;
-        }
-
-        @Override
-        public String handleResponse(HttpResponse response)
-            throws ClientProtocolException, IOException {
-            if (response != null
-                    && response.getStatusLine() != null
-                    && !String.valueOf(response.getStatusLine().getStatusCode()).startsWith("2")) {
-                throw new IOException("exception happend when getting response. StatusCode=" + response.getStatusLine().getStatusCode());
-            }
-
-            InputStream is = response.getEntity().getContent();
-            String ret = null;
-            if (mHttpRequestHookListener != null) {
-                ret = mHttpRequestHookListener.onInputStreamReturn(mRequestUrl, is);
-            } else {
-                throw new IOException("can't find HttpReturnInterface Impl");
-            }
-
-            return ret;
-        }
     }
 
     private DefaultHttpClient createHttpClientByte() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, KeyManagementException {
@@ -349,7 +307,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         return params;
     }
 
-    private HttpRequestBase createHttpRequest(String url, String method, HttpEntity entity) {
+    private HttpRequestBase createHttpRequest(HttpClient httpClient, HttpClient httpClientByte, String url, String method, HttpEntity entity) {
         checkParams(url, method);
         HttpRequestBase httpRequest = null;
         if (method.equalsIgnoreCase(HTTP_REQUEST_METHOD_GET)) {
@@ -386,28 +344,17 @@ public class HttpClientInternalImpl implements HttpClientInterface {
     }
 
     private void preExecuteHttpRequest() {
-        httpClient.getConnectionManager().closeExpiredConnections();
+        mHttpClient.getConnectionManager().closeExpiredConnections();
     }
 
     private void onExecuteException(HttpRequestBase httpRequest) {
         httpRequest.abort();
     }
 
-    private String getInputStreamResponse(HttpRequestBase httpRequest, String url) throws NetWorkException {
-        try {
-            preExecuteHttpRequest();
-            StreamResponseHandler handler = new StreamResponseHandler(url);
-            return httpClientByte.execute(httpRequest, handler);
-        } catch (Exception e) {
-            onExecuteException(httpRequest);
-            throw new NetWorkException(NetWorkException.NETWORK_ERROR, "Network connect error", e.toString(), null);
-        }
-    }
-
     private InputStream getInputStreamResponse1(HttpRequestBase httpRequest, String url) throws NetWorkException {
         preExecuteHttpRequest();
         try {
-            HttpResponse response = httpClientByte.execute(httpRequest);
+            HttpResponse response = mHttpClientByte.execute(httpRequest);
             if (response != null
                     && response.getStatusLine() != null
                     && !String.valueOf(response.getStatusLine().getStatusCode()).startsWith("2")) {
@@ -429,7 +376,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         try {
             preExecuteHttpRequest();
             ByteDataResponseHandler handler = new ByteDataResponseHandler();
-            return httpClientByte.execute(httpRequest, handler);
+            return mHttpClientByte.execute(httpRequest, handler);
         } catch (Exception e) {
             onExecuteException(httpRequest);
             throw new NetWorkException(NetWorkException.NETWORK_ERROR, "Network connect error", e.toString(), null);
@@ -441,7 +388,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         try {
             preExecuteHttpRequest();
             StringResponseHandler handler = new StringResponseHandler();
-            return httpClient.execute(httpRequest, handler);
+            return mHttpClient.execute(httpRequest, handler);
         } catch (Exception e) {
             onExecuteException(httpRequest);
             throw new NetWorkException(NetWorkException.NETWORK_ERROR, "Network connect error", e.toString(), null);

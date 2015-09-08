@@ -28,17 +28,10 @@ class InternetUtilInternal {
 
     public static InputStream requestInputstreamResource(Context context, String url, List<NameValuePair> headers) throws NetWorkException {
         if (context != null && HttpClientFactory.createHttpClientInterface(context.getApplicationContext()) != null) {
-            return HttpClientFactory.createHttpClientInterface(context.getApplicationContext()).getInputStreamResource(url, "GET", null, headers);
+            return HttpClientFactory.createHttpClientInterface(context.getApplicationContext()).getInputStreamResource(url, "GET", null, headers, null);
         }
 
         return null;
     }
-
-    @Deprecated
-	public static void setHttpReturnListener(Context context, HttpRequestHookListener l) {
-		if (context != null && HttpClientFactory.createHttpClientInterface(context.getApplicationContext()) != null) {
-			HttpClientFactory.createHttpClientInterface(context.getApplicationContext()).setHttpReturnListener(l);
-		}
-	}
 
 }
