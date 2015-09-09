@@ -83,4 +83,11 @@ public class CoreConfig {
             DEFAULT_DEBUG_LOG.d("", msg, e);
         }
     }
+
+    public static final class VERSION {
+
+        public static final String SDK_VERSION = "15.09.07";
+
+    }
+
 }

@@ -10,6 +10,7 @@ import com.michael.corelib.internet.core.util.JsonUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
@@ -56,7 +57,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
     public <T> T request(RequestBase<T> request) throws NetWorkException {
         long entryTime = System.currentTimeMillis();
         if (DEBUG) {
-            NetworkLog.LOGD("Entery Internet request, current time = " + entryTime + "ms from 1970");
+            NetworkLog.LOGD("[[BeanRequestDefaultImplInternal::request]] entry Internet request, current time = " + entryTime + "ms from 1970");
         }
 
         if (request == null) {
@@ -91,25 +92,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
             throw new NetWorkException(NetWorkException.MISS_CONTENT, "Content type must be specified", null, null);
         }
 
-        if (DEBUG) {
-            StringBuilder param = new StringBuilder();
-            if (baseParams != null) {
-                for (String key : baseParams.keySet()) {
-                    param.append("|    ").append(key).append(" : ").append(baseParams.get(key)).append("\n");
-                }
-
-                param.append("| HTTP Method = ").append("\n");
-                param.append("|    ").append(KEY_HTTP_METHOD).append(" : ").append(httpMethod).append("\n");
-
-                param.append("| header params = ").append("\n");
-                for (String key : headerBundle.keySet()) {
-                    param.append("|    ").append(key).append(" : ").append(headerBundle.get(key)).append("\n");
-                }
-            }
-
-            NetworkLog.LOGD("\n\n//*****\n| [[request::" + request + "]] \n" + "| RestAPI URL = " + api_url
-                                + "\n| Params is = \n" + param + " \n\\\\*****\n");
-        }
+        dumpRequestInfo(request, baseParams, httpMethod, headerBundle, api_url);
 
         HttpEntity entity = null;
         if (!contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_MUTIPART)) {
@@ -131,17 +114,23 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                                 }
                             });
 
-                            StringBuilder paramSb = new StringBuilder();
-                            for (NameValuePair pair : paramList) {
-                                paramSb.append(pair.getName()).append("=").append(pair.getValue()).append("&");
-                            }
-                            String data = null;
-                            if (paramSb.length() > 0) {
-                                data = paramSb.subSequence(0, paramSb.length() - 1).toString();
-                            }
+                            if (request.isShouldUrlEncodedParam()) {
+                                if (paramList != null) {
+                                    entity = new UrlEncodedFormEntity(paramList, HTTP.UTF_8);
+                                }
+                            } else {
+                                StringBuilder paramSb = new StringBuilder();
+                                for (NameValuePair pair : paramList) {
+                                    paramSb.append(pair.getName()).append("=").append(pair.getValue()).append("&");
+                                }
+                                String data = null;
+                                if (paramSb.length() > 0) {
+                                    data = paramSb.subSequence(0, paramSb.length() - 1).toString();
+                                }
 
-                            if (!TextUtils.isEmpty(data)) {
-                                entity = new StringEntity(data);
+                                if (!TextUtils.isEmpty(data)) {
+                                    entity = new StringEntity(data, HTTP.UTF_8);
+                                }
                             }
                         } catch (UnsupportedEncodingException e) {
                             throw new NetWorkException(NetWorkException.ENCODE_HTTP_PARAMS_ERROR, "Unable to encode http parameters", null, null);
@@ -200,7 +189,6 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                 return (T) response;
             } else {
                 ret = JsonUtils.parse(response, request.getGenericType());
-
                 if (ret != null && ret instanceof ResponseBase) {
                     NetworkResponse info = new NetworkResponse(httpResponse.getStatusLine().getStatusCode(), response, httpResponse.getAllHeaders());
                     ((ResponseBase) ret).networkResponse = info;
@@ -237,49 +225,6 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         return str;
     }
 
-    @Override
-    public String getSig(Bundle params, String secret_key) {
-        if (params == null || params.size() == 0) {
-            return null;
-        }
-
-        TreeMap<String, String> sortParams = new TreeMap<String, String>();
-        for (String key : params.keySet()) {
-            sortParams.put(key, params.getString(key));
-        }
-
-        Vector<String> vecSig = new Vector<String>();
-        for (String key : sortParams.keySet()) {
-            String value = sortParams.get(key);
-            if (value.length() > NetworkLog.SIG_PARAM_MAX_LENGTH) {
-                value = value.substring(0, NetworkLog.SIG_PARAM_MAX_LENGTH);
-            }
-            vecSig.add(key + "=" + value);
-        }
-        // LOGD("[[getSig]] after operate, the params is : " + vecSig);
-
-        String[] nameValuePairs = new String[vecSig.size()];
-        vecSig.toArray(nameValuePairs);
-
-        for (int i = 0; i < nameValuePairs.length; i++) {
-            for (int j = nameValuePairs.length - 1; j > i; j--) {
-                if (nameValuePairs[j].compareTo(nameValuePairs[j - 1]) < 0) {
-                    String temp = nameValuePairs[j];
-                    nameValuePairs[j] = nameValuePairs[j - 1];
-                    nameValuePairs[j - 1] = temp;
-                }
-            }
-        }
-        StringBuffer nameValueStringBuffer = new StringBuffer();
-        for (int i = 0; i < nameValuePairs.length; i++) {
-            nameValueStringBuffer.append(nameValuePairs[i]);
-        }
-
-        nameValueStringBuffer.append(secret_key);
-        String sig = InternetStringUtils.MD5Encode(nameValueStringBuffer.toString());
-        return sig;
-    }
-
     private List<NameValuePair> convertBundleToNVPair(Bundle bundle) {
         if (bundle == null) {
             return null;
@@ -291,6 +236,28 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         }
 
         return list;
+    }
+
+    private <T> void dumpRequestInfo(RequestBase<T> request, Bundle baseParams, String httpMethod, Bundle headerBundle, String api_url) {
+        if (DEBUG) {
+            StringBuilder param = new StringBuilder();
+            if (baseParams != null) {
+                for (String key : baseParams.keySet()) {
+                    param.append("|    ").append(key).append(" : ").append(baseParams.get(key)).append("\n");
+                }
+
+                param.append("| HTTP Method = ").append("\n");
+                param.append("|    ").append(KEY_HTTP_METHOD).append(" : ").append(httpMethod).append("\n");
+
+                param.append("| header params = ").append("\n");
+                for (String key : headerBundle.keySet()) {
+                    param.append("|    ").append(key).append(" : ").append(headerBundle.get(key)).append("\n");
+                }
+            }
+
+            NetworkLog.LOGD("\n\n//*****\n| [[request::" + request + "]] \n" + "| RestAPI URL = " + api_url
+                                + "\n| Params is = \n" + param + " \n\\\\*****\n");
+        }
     }
 
     private void dumpResponse(String request, String response) {
