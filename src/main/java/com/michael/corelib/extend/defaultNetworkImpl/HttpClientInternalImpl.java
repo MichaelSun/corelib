@@ -238,7 +238,10 @@ public class HttpClientInternalImpl implements HttpClientInterface {
                     && response.getStatusLine() != null
                     && String.valueOf(response.getStatusLine().getStatusCode()).startsWith("2")) {
                 try {
-                    r = InternetStringUtils.unGzipBytesToString(response.getEntity().getContent()).trim();
+                    String str = InternetStringUtils.unGzipBytesToString(response.getEntity().getContent());
+                    if(!TextUtils.isEmpty(str)){
+                        r = str.trim();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
