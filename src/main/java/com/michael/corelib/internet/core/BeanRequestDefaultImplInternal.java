@@ -178,7 +178,10 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         if (httpResponse.getStatusLine() != null
                 && String.valueOf(httpResponse.getStatusLine().getStatusCode()).startsWith("2")) {
             try {
-                response = InternetStringUtils.unGzipBytesToString(httpResponse.getEntity().getContent()).trim();
+                String str = InternetStringUtils.unGzipBytesToString(httpResponse.getEntity().getContent());
+                if(!TextUtils.isEmpty(str)){
+                    response = str.trim();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
