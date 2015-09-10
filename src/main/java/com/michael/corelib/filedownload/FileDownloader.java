@@ -95,7 +95,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
         }
     };
 
-    public static FileDownloader getInstance(Context context) {
+    public static FileDownloader getInstance() {
         return SingleInstanceManager.getInstance().getSingleInstanceByClass(FileDownloader.class);
     }
 

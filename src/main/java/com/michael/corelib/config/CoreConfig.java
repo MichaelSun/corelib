@@ -86,7 +86,7 @@ public class CoreConfig {
 
     public static final class VERSION {
 
-        public static final String SDK_VERSION = "15.09.08";
+        public static final String SDK_VERSION = "15.09.10";
 
     }
 

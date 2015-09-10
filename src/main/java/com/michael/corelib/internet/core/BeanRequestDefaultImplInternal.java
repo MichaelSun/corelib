@@ -129,8 +129,13 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                                 }
 
                                 if (!TextUtils.isEmpty(data)) {
-                                    entity = new StringEntity(data, HTTP.UTF_8);
+                                    entity = new StringEntity(data);
                                 }
+
+                                if (DEBUG) {
+                                    NetworkLog.LOGD("[[Request]] data : " + data);
+                                }
+
                             }
                         } catch (UnsupportedEncodingException e) {
                             throw new NetWorkException(NetWorkException.ENCODE_HTTP_PARAMS_ERROR, "Unable to encode http parameters", null, null);
