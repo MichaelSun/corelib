@@ -8,8 +8,21 @@ CoreLib是一个工具核心库。
 * 自定义线程池。
 * SingleInstance管理。
 
+Sample工程:
+-----------
+https://github.com/MichaelSun/CorelibSample
+
+
 集成方式
 ----------
+
+AndroidMenifest.xml加入一下权限：
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
 corelib是lib工程，直接导入。
 
 初始化代码加入App，需要在所有的初始化之前：
