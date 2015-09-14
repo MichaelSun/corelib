@@ -258,6 +258,15 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                 for (String key : headerBundle.keySet()) {
                     param.append("|    ").append(key).append(" : ").append(headerBundle.get(key)).append("\n");
                 }
+
+                param.append("| CustomHttpParams = ").append("\n");
+                if (request.getCustomHttpParams() != null) {
+                    param.append("|    ").append("connection_timeout : ").append(request.getCustomHttpParams().connection_timeout).append("\n");
+                    param.append("|    ").append("so_timeout : ").append(request.getCustomHttpParams().so_timeout).append("\n");
+                    param.append("|    ").append("buffer_size : ").append(request.getCustomHttpParams().buffer_size).append("\n");
+                    param.append("|    ").append("tcpNoDelay : ").append(request.getCustomHttpParams().tcpNoDelay).append("\n");
+                    param.append("|    ").append("staleCheckingEnabled : ").append(request.getCustomHttpParams().staleCheckingEnabled).append("\n");
+                }
             }
 
             NetworkLog.LOGD("\n\n//*****\n| [[request::" + request + "]] \n" + "| RestAPI URL = " + api_url
