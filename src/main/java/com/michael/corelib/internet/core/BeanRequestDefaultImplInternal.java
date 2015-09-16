@@ -89,7 +89,10 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         baseParams.remove(KEY_HTTP_METHOD);
         String contentType = requestEntity.getContentType();
         if (contentType == null) {
-            throw new NetWorkException(NetWorkException.MISS_CONTENT, "Content type must be specified", null, null);
+            throw new NetWorkException(NetWorkException.MISS_CONTENT, "Content type must be specified.", null, null);
+        }
+        if (TextUtils.isEmpty(api_url)) {
+            throw new NetWorkException(NetWorkException.TARGET_HOST_EMPTY, "Target host must not be null.", null, null);
         }
 
         dumpRequestInfo(request, baseParams, httpMethod, headerBundle, api_url);

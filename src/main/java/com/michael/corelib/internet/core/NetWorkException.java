@@ -15,7 +15,8 @@ public class NetWorkException extends Exception {
     public static final int ENCODE_HTTP_PARAMS_ERROR = -8;
     public static final int REQUEST_NULL = -9;
     public static final int RESPONSE_PARSE_ERROR = -10;
-    
+    public static final int TARGET_HOST_EMPTY = -11;
+
     public final int exceptionCode;
     public final String developerExceptionMsg;
     public final String userExceptionMsg;
