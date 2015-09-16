@@ -3,6 +3,7 @@ package com.michael.corelib.internet.core;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.extend.defaultNetworkImpl.MultipartHttpEntity;
 import com.michael.corelib.internet.NetworkLog;
 import com.michael.corelib.internet.core.util.InternetStringUtils;
@@ -20,8 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 class BeanRequestDefaultImplInternal implements BeanRequestInterface {
-
-    private static final boolean DEBUG = NetworkLog.DEBUG;
 
     private static final String KEY_METHOD = "method";
 
@@ -56,7 +55,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
     @Override
     public <T> T request(RequestBase<T> request) throws NetWorkException {
         long entryTime = System.currentTimeMillis();
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             NetworkLog.LOGD("[[BeanRequestDefaultImplInternal::request]] entry Internet request, current time = " + entryTime + "ms from 1970");
         }
 
@@ -135,7 +134,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                                     entity = new StringEntity(data);
                                 }
 
-                                if (DEBUG) {
+                                if (CoreConfig.DEBUG) {
                                     NetworkLog.LOGD("[[Request]] data : " + data);
                                 }
 
@@ -226,7 +225,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
 
         String str = sb.substring(0, sb.lastIndexOf(",")) + "}";
 
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             NetworkLog.LOGD("[[BeanRequestDefaultImplInternal::convertNVPairToJson]] convertNVPairToJson data : " + str);
         }
 
@@ -247,7 +246,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
     }
 
     private <T> void dumpRequestInfo(RequestBase<T> request, Bundle baseParams, String httpMethod, Bundle headerBundle, String api_url) {
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             StringBuilder param = new StringBuilder();
             if (baseParams != null) {
                 for (String key : baseParams.keySet()) {
@@ -278,7 +277,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
     }
 
     private void dumpResponse(String request, String response) {
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             NetworkLog.LOGD(response);
             long endTime = System.currentTimeMillis();
             StringBuilder sb = new StringBuilder(1024);

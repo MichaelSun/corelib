@@ -1,6 +1,7 @@
 package com.michael.corelib.internet;
 
 import android.content.Context;
+import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.coreutils.CustomThreadPool;
 import com.michael.corelib.internet.core.NetWorkException;
 import com.michael.corelib.internet.core.NetworkResponse;
@@ -54,7 +55,7 @@ public class InternetClient {
                     }
                     return;
                 } catch (NetWorkException e) {
-                    if (NetworkLog.DEBUG) {
+                    if (CoreConfig.DEBUG) {
                         NetworkLog.LOGD(e.toString());
                     }
                     networkResponse = e.networkResponse;

@@ -8,7 +8,7 @@ package com.michael.corelib.internet.core;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import com.michael.corelib.internet.NetworkLog;
+import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.internet.core.annotations.*;
 
 import java.lang.reflect.Field;
@@ -43,8 +43,6 @@ public abstract class RequestBase<T> {
         public boolean staleCheckingEnabled = true;
 
     }
-
-    private static final boolean DEBUG = NetworkLog.DEBUG;
 
     private RequestEntity mRequestEntity;
 
@@ -105,7 +103,7 @@ public abstract class RequestBase<T> {
             c = c.getSuperclass();
         }
 
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             for (Class<?> cl : classList) {
                 LOGD("Class Name : " + cl.getName());
             }
@@ -135,7 +133,7 @@ public abstract class RequestBase<T> {
             c = c.getSuperclass();
         }
 
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             for (Class<?> cl : classList) {
                 LOGD("Class Name : " + cl.getName());
             }
@@ -289,7 +287,7 @@ public abstract class RequestBase<T> {
     }
 
     private void LOGD(String message) {
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             Log.d(this.getClass().getName(), message);
         }
     }

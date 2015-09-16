@@ -5,7 +5,6 @@ import android.os.Environment;
 import com.michael.corelib.corelog.CoreLog;
 import com.michael.corelib.corelog.DebugLog;
 import com.michael.corelib.coreutils.SingleInstanceManager;
-import com.michael.corelib.internet.NetworkLog;
 
 import java.io.File;
 
@@ -26,6 +25,14 @@ public class CoreConfig {
 
     private static DebugLog DEFAULT_DEBUG_LOG;
 
+    public static void init(Context context) {
+        if (context == null) {
+            return;
+        }
+
+        init(context, false);
+    }
+
     /**
      * 初始化corelib
      *
@@ -41,16 +48,15 @@ public class CoreConfig {
                        ? Environment.getExternalStorageDirectory().getAbsolutePath() + "/."
                              + com.michael.corelib.coreutils.Environment.getPackageName(context)
                        : ROOT_DIR;
-        if (debug) {
-            DEBUG = debug;
-        }
-
-        DEFAULT_DEBUG_LOG = CoreLog.getInstance().getDebugLogByFileName("");
-        //初始化SingleManager
+        DEBUG = debug;
         SingleInstanceManager.getInstance().init(context);
-        NetworkLog.DEBUG = DEBUG;
-        LOGD("[[CoreConfig::init]] ROOT_DIR = " + ROOT_DIR);
 
+        if (DEBUG) {
+            DEFAULT_DEBUG_LOG = CoreLog.getInstance().getDebugLogByFileName("");
+        } else {
+            DEFAULT_DEBUG_LOG = null;
+            CoreLog.getInstance().clearDebugLogFileObj();
+        }
         CORE_LIB_INIT = true;
     }
 

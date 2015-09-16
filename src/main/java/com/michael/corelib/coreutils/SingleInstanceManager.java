@@ -19,8 +19,6 @@ public class SingleInstanceManager {
 
     private static final String TAG = "SingleInstanceManager";
 
-    private static boolean DEBUG = CoreConfig.DEBUG;
-
     private static SingleInstanceManager gSingleInstanceManager;
 
     private static Object obj = new Object();
@@ -64,7 +62,6 @@ public class SingleInstanceManager {
 
     public void init(Context context) {
         mContext = context.getApplicationContext();
-        DEBUG = CoreConfig.DEBUG;
     }
 
     private SingleInstanceManager() {
@@ -108,25 +105,25 @@ public class SingleInstanceManager {
         }
 
         try {
-            if (DEBUG) {
+            if (CoreConfig.DEBUG) {
                 Log.d(TAG, "[[makeNewInstance]] class name = " + classType.getName());
             }
 
             // Class classObj = Class.forName(classType.getName());
             Constructor<?> c = classType.getDeclaredConstructor();
 
-            if (DEBUG) {
+            if (CoreConfig.DEBUG) {
                 Log.d(TAG, "[[makeNewInstance]] Constructor = " + c.toGenericString() + " accessible = " + c.isAccessible());
             }
 
             c.setAccessible(true);
 
-            if (DEBUG) {
+            if (CoreConfig.DEBUG) {
                 Log.d(TAG, "[[makeNewInstance]] Constructor changed = " + c.isAccessible());
             }
 
             Object obj = c.newInstance();
-            if (DEBUG) {
+            if (CoreConfig.DEBUG) {
                 Log.d(TAG, "[[makeNewInstance]] create obj = " + obj + " SingleInstanceBase is " + (obj instanceof SingleInstanceBase));
             }
 
@@ -149,7 +146,7 @@ public class SingleInstanceManager {
     }
 
     private void dump() {
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             Log.d(TAG, "============= info for SingleInstanceManager ===========");
             for (Class c : mSingleInstanceCache.keySet()) {
                 Log.d(TAG, "    key : " + c.getName() + " value = " + mSingleInstanceCache.get(c).toString());

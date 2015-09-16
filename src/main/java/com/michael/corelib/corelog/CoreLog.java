@@ -33,4 +33,8 @@ public class CoreLog {
 
         return debugLog;
     }
+
+    public void clearDebugLogFileObj() {
+        mDebugLogMap.clear();
+    }
 }

@@ -6,6 +6,7 @@
 package com.michael.corelib.extend.defaultNetworkImpl;
 
 import android.os.Bundle;
+import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.internet.NetworkLog;
 import com.michael.corelib.internet.core.RequestEntity;
 import org.apache.http.entity.AbstractHttpEntity;
@@ -137,21 +138,21 @@ public class MultipartHttpEntity extends AbstractHttpEntity {
 
     @Override
     public void writeTo(OutputStream outstream) throws IOException {
-        if (NetworkLog.DEBUG) {
+        if (CoreConfig.DEBUG) {
             NetworkLog.LOGD("<<<<<<<<<<<<<<< Begin write Multi Part body >>>>>>>>>>>>>>>");
         }
 
         FileInputStream fis = null;
         try {
             outstream.write(beginData);
-            if (NetworkLog.DEBUG) {
+            if (CoreConfig.DEBUG) {
                 String beginStr = new String(beginData);
                 NetworkLog.LOGD(" After write the Begin Data : \n " + beginStr + " \n\n");
             }
             int index = 0;
             for (byte[] fileItemData : fileItemDatas) {
                 outstream.write(fileItemData);
-                if (NetworkLog.DEBUG) {
+                if (CoreConfig.DEBUG) {
                     String fileItemStr = new String(fileItemData);
                     NetworkLog.LOGD(" After write the file item data : \n" + fileItemStr + "\n\n");
                 }
@@ -197,7 +198,7 @@ public class MultipartHttpEntity extends AbstractHttpEntity {
             }
             outstream.write(endData);
 
-            if (NetworkLog.DEBUG) {
+            if (CoreConfig.DEBUG) {
                 String endStr = new String(endData);
                 NetworkLog.LOGD("     After write the end data : " + endStr);
                 NetworkLog.LOGD("<<<<<<<<<<<<<<< end write Multi Part body >>>>>>>>>>>>>>>");

@@ -18,8 +18,6 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
 
     private static final String TAG = FileDownloader.class.getSimpleName();
 
-    protected static boolean DEBUG = CoreConfig.DEBUG;
-
     protected static final boolean SUPPORT_RANGED = true;
 
     protected static final boolean RUNTIME_CLOSE_SUPPORTED = false;
@@ -180,13 +178,13 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
             String extension = TextUtils.isEmpty(request.mFileExtension) ? "" : "." + request.mFileExtension;
             File cachedFile = new File(DOWNLOADED_FILE_DIR + saveUrl + extension);
             if (cachedFile.exists()) {
-                if (DEBUG) {
+                if (CoreConfig.DEBUG) {
                     CoreConfig.LOGD("<<<<< [[find in cache]] >>>>> ::::::::: " + cachedFile.getAbsolutePath());
                 }
                 return cachedFile.getAbsolutePath();
             }
         }
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             CoreConfig.LOGD("<<<<< [[can not find in cache]] >>>>> ::::::::: " + request.toString());
         }
         return null;
@@ -203,7 +201,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
             return false;
         }
 
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             CoreConfig.LOGD("<<<<< [[postRequest]] >>>>> ::::::::: " + request.toString());
         }
 
@@ -239,7 +237,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                     mRequestList.add(request);
                 }
 
-                if (DEBUG) {
+                if (CoreConfig.DEBUG) {
                     CoreConfig.LOGD("postRequest, add request : " + request.toString() + " into download list");
                 }
             }
@@ -250,14 +248,14 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                 return false;
             } else {
                 if (tss.taskCount < tss.ALLOWED_MAX_TAKS) {
-                    if (DEBUG) {
+                    if (CoreConfig.DEBUG) {
                         CoreConfig.LOGD("entry into [[postRequest]] to start process ");
                     }
                     processWorks();
                 }
             }
         }
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             CoreConfig.LOGD("<<<<< [[postRequest]]  end synchronized (mRequestList) >>>>>");
         }
 
@@ -265,14 +263,14 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
             if (bIsWaiting) {
                 bIsWaiting = false;
 
-                if (DEBUG) {
+                if (CoreConfig.DEBUG) {
                     CoreConfig.LOGD("try to notify download process begin");
                 }
                 objLock.notify();
             }
         }
 
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             CoreConfig.LOGD("<<<<< [[postRequest]]  end synchronized (objLock) >>>>>");
         }
 
@@ -304,19 +302,19 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                 if (mRequestList.size() == 0 && !bIsWaiting) {
                     bIsWaiting = true;
 
-                    if (DEBUG) {
+                    if (CoreConfig.DEBUG) {
                         CoreConfig.LOGD("entry into [[waitforUrl]] for " + DEFAULT_KEEPALIVE + "ms");
                     }
                     objLock.wait(mKeepAlive);
 
-                    if (DEBUG) {
+                    if (CoreConfig.DEBUG) {
                         CoreConfig.LOGD("leave [[waitforUrl]] for " + DEFAULT_KEEPALIVE + "ms");
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            if (DEBUG) {
+            if (CoreConfig.DEBUG) {
                 CoreConfig.LOGD("Excption : ", e);
             }
         }
@@ -359,7 +357,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
         // return null;
         // }
 
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             CoreConfig.LOGD("");
             CoreConfig.LOGD("//-------------------------------------------------");
             CoreConfig.LOGD("||");
@@ -381,7 +379,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
             }
 
             long curTime = 0;
-            if (DEBUG) {
+            if (CoreConfig.DEBUG) {
                 CoreConfig.LOGD("[[FileDownloader::onInputStreamReturn]] try to download from inputstream to local path = "
                                     + INPUT_STREAM_CACHE_PATH
                                     + saveUrl
@@ -452,7 +450,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
 
             if (!isClosed && !TextUtils.isEmpty(savePath)
                     && checkInputStreamDownloadFile(savePath)) {
-                if (DEBUG) {
+                if (CoreConfig.DEBUG) {
                     long successTime = System.currentTimeMillis();
                     CoreConfig.LOGD("[[FileDownloader::onInputStreamReturn]] save Request url : "
                                         + saveUrl
@@ -465,14 +463,14 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                 return savePath;
             } else {
                 // 遗留文件，用于下次的断点下载
-                if (DEBUG) {
+                if (CoreConfig.DEBUG) {
                     CoreConfig.LOGD("[[FileDownloader::onInputStreamReturn]] failed to downlaod requestUrl : "
                                         + request.getDownloadUrl() + " beacuse the debug 断点 =====");
                 }
                 return null;
             }
         } else {
-            if (DEBUG) {
+            if (CoreConfig.DEBUG) {
                 CoreConfig.LOGD("[[FileDownloader::onInputStreamReturn]] failed to downlaod requestUrl : "
                                     + request.getDownloadUrl() + " beacuse download InputStream is NULL =====");
             }
@@ -493,7 +491,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
         while (!bIsStop) {
             waitforUrl();
 
-            if (DEBUG) {
+            if (CoreConfig.DEBUG) {
                 CoreConfig.LOGD("<<<<< [[run]] >>>>>");
             }
             synchronized (mRequestList) {
@@ -504,7 +502,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                 }
             }
 
-            if (DEBUG) {
+            if (CoreConfig.DEBUG) {
                 CoreConfig.LOGD("<<<<< [[run]]  end synchronized (mRequestList) >>>>>");
             }
 
@@ -515,7 +513,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                     bIsStop = true;
                 }
                 if (request != null && request.mStatus != DownloadRequest.STATUS_CANCEL) {
-                    if (DEBUG) {
+                    if (CoreConfig.DEBUG) {
                         CoreConfig.LOGD("// ================ <<" + Thread.currentThread().getName() + ">> working on : ");
                         CoreConfig.LOGD("|| begin operate one request : " + request.toString());
                         CoreConfig.LOGD("\\\\============================================");
@@ -528,7 +526,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                         cacheFile = onInputStreamReturn(request, is);
                     }
 
-                    if (DEBUG) {
+                    if (CoreConfig.DEBUG) {
                         CoreConfig.LOGD("[[FileDownloader::run]] after get the cache file : " + cacheFile);
                     }
                     if (!TextUtils.isEmpty(cacheFile)) {
@@ -541,7 +539,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                             if (response != null) {
                                 handleDownloadFinish(request, response, DownloadRequest.DownloadListener.DOWNLOAD_SUCCESS);
                                 removeRequest(request);
-                                if (DEBUG) {
+                                if (CoreConfig.DEBUG) {
                                     CoreConfig.LOGD("success end operate one request : " + request.toString());
                                 }
                                 continue;
@@ -563,7 +561,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                if (DEBUG) {
+                if (CoreConfig.DEBUG) {
                     CoreConfig.LOGD("Exception : ", e);
                     CoreConfig.LOGD("exception end operate one request : " + request);
                     CoreConfig.LOGD(e.getStackTrace().toString());
@@ -589,7 +587,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
      * @return
      */
     private DownloadRequest findRequestCanOperate(ArrayList<DownloadRequest> requestList) {
-        if (DEBUG) {
+        if (CoreConfig.DEBUG) {
             CoreConfig.LOGD("[[FileDownloader::findRequestCanOperate]]");
         }
 
@@ -598,7 +596,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                 if (!r.requestIsOperating.get()) {
                     r.requestIsOperating.set(true);
 
-                    if (DEBUG) {
+                    if (CoreConfig.DEBUG) {
                         CoreConfig.LOGD("[[FileDownloader::findRequestCanOperate]] find one Request : " + r.toString());
                     }
                     return r;
@@ -642,7 +640,6 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
 
     @Override
     public void init(Context context) {
-        DEBUG = CoreConfig.DEBUG;
         INPUT_STREAM_CACHE_PATH = SubDirPathManager.tryToFetchPath(context, "stream_cache");
         DOWNLOADED_FILE_DIR = SubDirPathManager.tryToFetchPath(context, "filedownload");
         mContext = context.getApplicationContext();
