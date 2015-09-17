@@ -2,6 +2,7 @@ package com.michael.corelib.config;
 
 import android.content.Context;
 import android.os.Environment;
+import com.michael.corelib.BuildConfig;
 import com.michael.corelib.corelog.CoreLog;
 import com.michael.corelib.corelog.DebugLog;
 import com.michael.corelib.coreutils.SingleInstanceManager;
@@ -92,7 +93,7 @@ public class CoreConfig {
 
     public static final class VERSION {
 
-        public static final String SDK_VERSION = "15.09.16";
+        public static final String SDK_VERSION = BuildConfig.SDK_VERSION;
 
     }
 
