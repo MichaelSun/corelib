@@ -130,10 +130,13 @@ public final class CrashHandler implements UncaughtExceptionHandler {
             if (Environment.isSDCardReady()) {
                 File dir = new File(CRASH_DIR);
                 if (!dir.exists()) {
-                    dir.mkdirs();
+                    if (!dir.mkdirs()) {
+                        Log.e(TAG, "an error occured while writing file...");
+                        return null;
+                    }
                 }
                 FileOutputStream fos = new FileOutputStream(CRASH_DIR + fileName);
-                fos.write(sb.toString().getBytes());
+                fos.write(sb.toString().getBytes("UTF-8"));
                 fos.close();
             }
 

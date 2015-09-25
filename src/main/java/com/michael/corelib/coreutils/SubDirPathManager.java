@@ -29,11 +29,15 @@ public class SubDirPathManager {
 		String retDir = DISK_DIR + subDir + File.separator;
 		File dirCheck = new File(retDir);
 		if (dirCheck.exists() && !dirCheck.isDirectory()) {
-			dirCheck.delete();
+			if (!dirCheck.delete()) {
+				return null;
+			}
 		}
 
 		if (!dirCheck.exists()) {
-			dirCheck.mkdirs();
+			if (!dirCheck.mkdirs()) {
+				return null;
+			}
 		}
 
 		return retDir;

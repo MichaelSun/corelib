@@ -3,6 +3,7 @@ package com.michael.corelib.filedownload;
 import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.coreutils.*;
 import com.michael.corelib.internet.InternetClient;
@@ -54,7 +55,7 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
         String onFilenameCreateWithDownloadUrl(String downloadUrl);
     }
 
-    private final class DefaultDownloadUrlEncodeListener implements DownloadFilenameCreateListener {
+    private static final class DefaultDownloadUrlEncodeListener implements DownloadFilenameCreateListener {
 
         @Override
         public String onFilenameCreateWithDownloadUrl(String downloadUrl) {
@@ -113,7 +114,9 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
         if (!TextUtils.isEmpty(dirFullPath)) {
             File dirFile = new File(dirFullPath);
             if (dirFile.exists() && dirFile.isFile()) {
-                dirFile.delete();
+                if (!dirFile.delete()) {
+                    throw new IllegalArgumentException("Can't delete file : " + dirFullPath);
+                }
             }
 
             boolean mkSuccess = false;
@@ -333,8 +336,10 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                                   : mDefaultDownloadFilenameCreateListener.onFilenameCreateWithDownloadUrl(requestUrl);
             File bigCacheFile = new File(INPUT_STREAM_CACHE_PATH);
             if (!bigCacheFile.exists() || !bigCacheFile.isDirectory()) {
-                bigCacheFile.delete();
-                bigCacheFile.mkdirs();
+                if (!bigCacheFile.delete() || !bigCacheFile.mkdirs()) {
+                    Log.e(TAG, "FileDownloader make dir : " + INPUT_STREAM_CACHE_PATH + " failed");
+                    return headers;
+                }
             }
 
             File tempFile = new File(INPUT_STREAM_CACHE_PATH + saveFile);
@@ -374,8 +379,10 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                                  : mDefaultDownloadFilenameCreateListener.onFilenameCreateWithDownloadUrl(request.getDownloadUrl());
             File bigCacheFile = new File(INPUT_STREAM_CACHE_PATH);
             if (!bigCacheFile.exists() || !bigCacheFile.isDirectory()) {
-                bigCacheFile.delete();
-                bigCacheFile.mkdirs();
+                if (!bigCacheFile.delete() || !bigCacheFile.mkdirs()) {
+                    Log.e(TAG, "FileDownloader make dir : " + INPUT_STREAM_CACHE_PATH + " failed");
+                    return null;
+                }
             }
 
             long curTime = 0;
@@ -564,10 +571,9 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
                 if (CoreConfig.DEBUG) {
                     CoreConfig.LOGD("Exception : ", e);
                     CoreConfig.LOGD("exception end operate one request : " + request);
-                    CoreConfig.LOGD(e.getStackTrace().toString());
                 }
 
-                if (request.getStatus() != DownloadRequest.STATUS_CANCEL) {
+                if (request != null && request.getStatus() != DownloadRequest.STATUS_CANCEL) {
                     handleDownloadFinish(request, null, DownloadRequest.DownloadListener.DOWNLOAD_FAILED);
                 } else {
                     handleDownloadFinish(request, null, DownloadRequest.DownloadListener.DOWNLOAD_CANCELED);
@@ -576,8 +582,6 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
 
             removeRequest(request);
         }
-
-        System.gc();
     }
 
     /**
@@ -659,8 +663,10 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
         CoreConfig.LOGD("[[FileDownloader::mvFileToDownloadedDir]] move cached file to : " + DOWNLOADED_FILE_DIR);
         File dir = new File(DOWNLOADED_FILE_DIR);
         if (!dir.exists() || !dir.isDirectory()) {
-            dir.delete();
-            dir.mkdirs();
+            if (!dir.delete() || !dir.mkdirs()) {
+                Log.e(TAG, "FileDownloader make dir : " + dir + " failed");
+                return null;
+            }
         }
 
         File cachelFile = new File(cachedFileName);
@@ -679,7 +685,9 @@ public class FileDownloader implements SingleInstanceManager.SingleInstanceBase,
 
         try {
             FileUtils.copyFile(cachelFile, newFile);
-            cachelFile.delete();
+            if (!cachelFile.delete()) {
+                Log.e(TAG, "FileDownloader move cache download file : " + cachedFileName + " failed");
+            }
             return newFile.getAbsolutePath();
         } catch (IOException e) {
             e.printStackTrace();

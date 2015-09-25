@@ -18,6 +18,7 @@ import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 class BeanRequestDefaultImplInternal implements BeanRequestInterface {
@@ -31,8 +32,6 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
     private static BeanRequestDefaultImplInternal mInstance;
 
     private HttpClientInterface mHttpClientImpl;
-
-    private Context mContext;
 
     private static Object lockObject = new Object();
 
@@ -48,7 +47,6 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
     }
 
     private BeanRequestDefaultImplInternal(Context context) {
-        mContext = context;
         mHttpClientImpl = HttpClientFactory.createHttpClientInterface(context);
     }
 
@@ -89,9 +87,6 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         String contentType = requestEntity.getContentType();
         if (contentType == null) {
             throw new NetWorkException(NetWorkException.MISS_CONTENT, "Content type must be specified.", null, null);
-        }
-        if (TextUtils.isEmpty(api_url)) {
-            throw new NetWorkException(NetWorkException.TARGET_HOST_EMPTY, "Target host must not be null.", null, null);
         }
 
         dumpRequestInfo(request, baseParams, httpMethod, headerBundle, api_url);
@@ -151,10 +146,18 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                     sb.append(key).append("=").append(baseParams.getString(key)).append("&");
                 }
                 api_url = sb.substring(0, sb.length() - 1);
+
+                if (request.isShouldUrlEncodedParam() && !TextUtils.isEmpty(api_url)) {
+                    api_url = urlEnCode(api_url);
+                }
             }
         } else if (contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_MUTIPART)) {
             requestEntity.setBasicParams(baseParams);
             entity = new MultipartHttpEntity(requestEntity);
+        }
+
+        if (TextUtils.isEmpty(api_url)) {
+            throw new NetWorkException(NetWorkException.TARGET_HOST_EMPTY, "Target host must not be null.", null, null);
         }
 
         HttpResponse httpResponse = null;
@@ -243,6 +246,19 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         }
 
         return list;
+    }
+
+    private String urlEnCode(String s) {
+        if (s == null) {
+            return null;
+        }
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private <T> void dumpRequestInfo(RequestBase<T> request, Bundle baseParams, String httpMethod, Bundle headerBundle, String api_url) {

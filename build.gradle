@@ -8,6 +8,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'findbugs'
 
 def CORE_SDK_VERSION = "15.09.17"
 
@@ -51,8 +52,20 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
+task findbugs(type: FindBugs) {
+    ignoreFailures = true
+        classes = fileTree('build/intermediates/classes/release')
+        source = fileTree('src')
+        classpath = files()
+        effort = 'max'
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+}
+
 task clearJar(type: Delete) {
-   delete 'build/outputs/corelib*'
+    delete 'build/outputs/corelib*'
 }
 
 task makeJar(type: Copy) {
@@ -63,3 +76,4 @@ task makeJar(type: Copy) {
 }
 
 makeJar.dependsOn(clearJar, build)
+

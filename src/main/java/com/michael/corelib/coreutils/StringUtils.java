@@ -297,8 +297,12 @@ public class StringUtils {
         try {
             PushbackInputStream pis = new PushbackInputStream(in, 2);
             byte[] signature = new byte[2];
-            pis.read(signature);
+            int readLength = pis.read(signature);
             pis.unread(signature);
+            if (readLength == -1) {
+                return null;
+            }
+
             int head = ((signature[0] & 0x00FF) | ((signature[1] << 8) & 0xFF00));
             if (head != GZIPInputStream.GZIP_MAGIC) {
                 return new String(toByteArray(pis), "UTF-8").trim();
@@ -314,7 +318,7 @@ public class StringUtils {
                 }
             } while (readCount > 0);
             if (outputByte.size() > 0) {
-                return new String(outputByte.toByteArray());
+                return new String(outputByte.toByteArray(), "UTF-8");
             }
         } catch (Exception e) {
             e.printStackTrace();

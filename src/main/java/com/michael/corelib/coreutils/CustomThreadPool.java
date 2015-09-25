@@ -135,7 +135,7 @@ public final class CustomThreadPool implements Destroyable, SingleInstanceManage
     }
 
     private static class IncrementInteger {
-        private final int MAX_SIZE = Integer.MAX_VALUE / 2;
+        private static final int MAX_SIZE = Integer.MAX_VALUE / 2;
 
         private final AtomicInteger mInt = new AtomicInteger(1);
 

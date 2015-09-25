@@ -483,13 +483,16 @@ public class JsonMapper {
         if (!TextUtils.isEmpty(fieldName)) {
             setterName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
         }
+
+        if (TextUtils.isEmpty(setterName)) {
+            throw new RuntimeException("setterName is null");
+        }
+
         try {
             Method setterMethod = instance.getClass().getMethod(setterName, type);
-
             if (setterMethod != null) {
                 setterMethod.invoke(instance, fieldDescription.value);
             }
-
         } catch (SecurityException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {

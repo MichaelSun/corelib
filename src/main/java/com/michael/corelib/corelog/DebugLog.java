@@ -284,10 +284,12 @@ public class DebugLog {
         f = new File(LOG_DIR, LOG_CURR_FILENAME);
         mOutWriter = null;
         try {
-            mOutWriter = new BufferedWriter(new OutputStreamWriter(
-                                                                      new FileOutputStream(f, true)));
+            mOutWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f, true), "UTF-8"));
             return true;
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return false;
         }

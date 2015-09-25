@@ -228,7 +228,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         return false;
     }
 
-    private class StringResponseHandler implements ResponseHandler<String> {
+    private static class StringResponseHandler implements ResponseHandler<String> {
 
         @Override
         public String handleResponse(HttpResponse response)
@@ -250,7 +250,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
         }
     }
 
-    private class ByteDataResponseHandler implements ResponseHandler<byte[]> {
+    private static class ByteDataResponseHandler implements ResponseHandler<byte[]> {
 
         @Override
         public byte[] handleResponse(HttpResponse response)

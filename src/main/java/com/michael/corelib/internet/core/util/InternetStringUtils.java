@@ -22,8 +22,12 @@ public class InternetStringUtils {
         try {
             PushbackInputStream pis = new PushbackInputStream(in, 2);
             byte[] signature = new byte[2];
-            pis.read(signature);
+            int len = pis.read(signature);
             pis.unread(signature);
+            if (len < 0) {
+                return null;
+            }
+
             int head = ((signature[0] & 0x00FF) | ((signature[1] << 8) & 0xFF00));
             if (head != GZIPInputStream.GZIP_MAGIC) {
                 return new String(toByteArray(pis), "UTF-8").trim();
@@ -40,7 +44,7 @@ public class InternetStringUtils {
             } while (readCount > 0);
             
             if (outputByte.size() > 0) {
-                return new String(outputByte.toByteArray());
+                return new String(outputByte.toByteArray(), "UTF-8");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,7 +67,7 @@ public class InternetStringUtils {
         String resultString = null;
         try {           
             MessageDigest md = MessageDigest.getInstance("MD5");
-            resultString = byteArrayToHexString(md.digest(origin.getBytes()));
+            resultString = byteArrayToHexString(md.digest(origin.getBytes("UTF-8")));
         }
         catch (Exception ex) {
         

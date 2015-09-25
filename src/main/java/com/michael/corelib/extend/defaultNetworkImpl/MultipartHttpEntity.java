@@ -71,8 +71,12 @@ public class MultipartHttpEntity extends AbstractHttpEntity {
         int size = 0;
         if (params != null) {
             for (String key : params.keySet()) {
-                size += key.getBytes().length;
-                size += params.getString(key).getBytes().length;
+                try {
+                    size += key.getBytes("UTF-8").length;
+                    size += params.getString(key).getBytes("UTF-8").length;
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -105,8 +109,10 @@ public class MultipartHttpEntity extends AbstractHttpEntity {
         try {
             return s.getBytes(HTTP.UTF_8);
         } catch (UnsupportedEncodingException e) {
-            return s.getBytes();
+            e.printStackTrace();
         }
+
+        return null;
     }
 
     private byte[] getFileItemBeginData(RequestEntity.MultipartFileItem fileItem) {
@@ -123,8 +129,10 @@ public class MultipartHttpEntity extends AbstractHttpEntity {
         try {
             return s.getBytes(HTTP.UTF_8);
         } catch (UnsupportedEncodingException e) {
-            return s.getBytes();
+            e.printStackTrace();
         }
+
+        return null;
     }
 
     private byte[] getEndData() {
@@ -132,8 +140,10 @@ public class MultipartHttpEntity extends AbstractHttpEntity {
         try {
             return s.getBytes(HTTP.UTF_8);
         } catch (UnsupportedEncodingException e) {
-            return s.getBytes();
+            e.printStackTrace();
         }
+
+        return null;
     }
 
     @Override
@@ -153,7 +163,7 @@ public class MultipartHttpEntity extends AbstractHttpEntity {
             for (byte[] fileItemData : fileItemDatas) {
                 outstream.write(fileItemData);
                 if (CoreConfig.DEBUG) {
-                    String fileItemStr = new String(fileItemData);
+                    String fileItemStr = new String(fileItemData, "UTF-8");
                     NetworkLog.LOGD(" After write the file item data : \n" + fileItemStr + "\n\n");
                 }
 
@@ -199,7 +209,7 @@ public class MultipartHttpEntity extends AbstractHttpEntity {
             outstream.write(endData);
 
             if (CoreConfig.DEBUG) {
-                String endStr = new String(endData);
+                String endStr = new String(endData, "UTF-8");
                 NetworkLog.LOGD("     After write the end data : " + endStr);
                 NetworkLog.LOGD("<<<<<<<<<<<<<<< end write Multi Part body >>>>>>>>>>>>>>>");
             }
