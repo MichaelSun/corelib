@@ -3,6 +3,7 @@ package com.michael.corelib.config;
 import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.michael.corelib.BuildConfig;
 import com.michael.corelib.corelog.CoreLog;
@@ -61,12 +62,29 @@ public class CoreConfig {
                 ? Environment.getExternalStorageDirectory().getAbsolutePath() + "/."
                 + com.michael.corelib.coreutils.Environment.getPackageName(context)
                 : ROOT_DIR;
+           init(context,debug,ROOT_DIR,logFileName);
+    }
+
+
+    public static void init(Context context, boolean debug, String path, String logFileName) {
+        if (context == null) {
+            return;
+        }
+        if (TextUtils.isEmpty(path)) {
+            ROOT_DIR = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)
+                    ? Environment.getExternalStorageDirectory().getAbsolutePath() + "/."
+                    + com.michael.corelib.coreutils.Environment.getPackageName(context)
+                    : ROOT_DIR;
+        }else {
+            ROOT_DIR = path;
+        }
+        Log.v("mandy"," corelib init: ROOT_DIR" + ROOT_DIR);
         DEBUG = debug;
         SingleInstanceManager.getInstance().init(context);
 
         if (DEBUG) {
             mLogFileName = logFileName;
-            DEFAULT_DEBUG_LOG = CoreLog.getInstance().getDebugLogByFileName(logFileName);
+            DEFAULT_DEBUG_LOG = CoreLog.getInstance().getDebugLogByFileName(ROOT_DIR,logFileName);
         } else {
             DEFAULT_DEBUG_LOG = null;
             CoreLog.getInstance().clearDebugLogFileObj();
@@ -82,7 +100,13 @@ public class CoreConfig {
         return new File(ROOT_DIR,mLogFileName).getAbsolutePath();
 
     }
+   public static void closeBug () {
+       if (DEFAULT_DEBUG_LOG == null) {
+           throw new IllegalArgumentException("please invoke CoreConfig.init before closeBug");
+       }
+       DEFAULT_DEBUG_LOG.close();
 
+   }
 
     public static void LOGD(String msg) {
         if (DEBUG) {

@@ -43,9 +43,8 @@ public class DebugLog {
     private SimpleDateFormat mDateFormat = new SimpleDateFormat(DATE_FORMAT);
     private Calendar mCalendar = Calendar.getInstance();
 
-    public DebugLog(String logFileName) {
-        LOG_DIR = CoreConfig.ROOT_DIR;
-
+    public DebugLog(String path,String logFileName) {
+        LOG_DIR = path;
         if (!TextUtils.isEmpty(logFileName)) {
             LOG_CURR_FILENAME = logFileName;
         }
@@ -131,6 +130,8 @@ public class DebugLog {
      * @param tr  An exception to log
      */
     public void d(String tag, String msg, Throwable tr) {
+
+
         writeLog(DEBUG_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
@@ -244,6 +245,11 @@ public class DebugLog {
 
     private synchronized void writeLog(String level, String tag, String msg,
                                        Throwable tr) {
+        File file = new File(LOG_DIR,LOG_CURR_FILENAME);
+        if (!file.exists()) {
+            mOutWriter = null;
+        }
+
         if (null == mOutWriter) {
             boolean success = openFile();
             if (!success) {
@@ -278,17 +284,28 @@ public class DebugLog {
             logDirExists = true;
         }
         if (!logDirExists) {
+            Log.v("mandy"," open file fail " + LOG_DIR);
             return false;
+
+        } else {
+            Log.v("mandy"," open file success: " + LOG_DIR);
+
         }
 
         f = new File(LOG_DIR, LOG_CURR_FILENAME);
+        close();
         mOutWriter = null;
         try {
             mOutWriter = new BufferedWriter(new OutputStreamWriter(
                                                                       new FileOutputStream(f, true)));
             return true;
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            try {
+                mOutWriter.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             return false;
         }
     }
