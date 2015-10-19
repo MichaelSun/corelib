@@ -233,8 +233,9 @@ public class DebugLog {
     }
 
     public void close() {
-        if (null != mOutWriter) {
+        if (mOutWriter != null) {
             try {
+                mOutWriter.flush();
                 mOutWriter.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -262,11 +263,11 @@ public class DebugLog {
 
         try {
             mOutWriter.write(log.toString());
-            mOutWriter.flush();
             mOutWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
+            close();
         }
 
         if (mCurrFileSize > MAX_LOGFILE_SIZE) {
@@ -293,7 +294,6 @@ public class DebugLog {
         }
 
         f = new File(LOG_DIR, LOG_CURR_FILENAME);
-        close();
         mOutWriter = null;
         try {
             mOutWriter = new BufferedWriter(new OutputStreamWriter(
