@@ -13,6 +13,9 @@ public class RequestEntity {
 
 	public static final String REQUEST_CONTENT_TYPE_JSON = "application/json";
 
+	//纯粹为了快盘的代码做的无奈兼容，不要吐槽
+	public static final String REQUEST_CONTENT_TYPE_JSON_OBJ = "application/json_object";
+
 	public static final String HEADER_KEY_CONTENT_TYPE = "Content-Type";
 	
 	private Bundle basicParams;

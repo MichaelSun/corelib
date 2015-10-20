@@ -105,7 +105,15 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                } else {
+                } else if(contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_JSON_OBJ)){
+                    requestEntity.setContentType(RequestEntity.REQUEST_CONTENT_TYPE_JSON);
+                    try {
+                        entity = new StringEntity(convertNVPairToJsonObj(baseParams), HTTP.UTF_8);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+
+                }else {
                     List<NameValuePair> paramList = convertBundleToNVPair(baseParams);
                     if (paramList != null) {
                         try {
@@ -221,6 +229,30 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         for (String key : keySet) {
             sb.append("\"").append(key).append("\"").append(":")
                 .append("\"").append(bundle.get(key)).append("\"").append(",");
+        }
+
+        String str = sb.substring(0, sb.lastIndexOf(",")) + "}";
+
+        if (CoreConfig.DEBUG) {
+            NetworkLog.LOGD("[[BeanRequestDefaultImplInternal::convertNVPairToJson]] convertNVPairToJson data : " + str);
+        }
+
+        return str;
+    }
+
+    private String convertNVPairToJsonObj(Bundle bundle){
+        if (bundle == null) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+
+        ArrayList<NameValuePair> list = new ArrayList<NameValuePair>();
+        Set<String> keySet = bundle.keySet();
+        for (String key : keySet) {
+            sb.append("\"").append(key).append("\"").append(":")
+                    .append(bundle.get(key)).append(",");
         }
 
         String str = sb.substring(0, sb.lastIndexOf(",")) + "}";
