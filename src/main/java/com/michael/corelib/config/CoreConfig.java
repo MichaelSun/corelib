@@ -78,7 +78,6 @@ public class CoreConfig {
         }else {
             ROOT_DIR = path;
         }
-        Log.v("mandy"," corelib init: ROOT_DIR" + ROOT_DIR);
         DEBUG = debug;
         SingleInstanceManager.getInstance().init(context);
 

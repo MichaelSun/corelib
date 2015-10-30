@@ -285,12 +285,7 @@ public class DebugLog {
             logDirExists = true;
         }
         if (!logDirExists) {
-            Log.v("mandy"," open file fail " + LOG_DIR);
             return false;
-
-        } else {
-            Log.v("mandy"," open file success: " + LOG_DIR);
-
         }
 
         f = new File(LOG_DIR, LOG_CURR_FILENAME);
