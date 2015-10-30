@@ -301,9 +301,6 @@ public class DebugLog {
                 e1.printStackTrace();
             }
             return false;
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return false;
         }
     }
 
