@@ -6,6 +6,7 @@ import android.os.Process;
 import android.text.TextUtils;
 import com.michael.corelib.config.CoreConfig;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -221,7 +222,7 @@ public final class CustomThreadPool implements Destroyable, SingleInstanceManage
                         }
                     });
 
-            mSpecialExectorMap = new HashMap<String, ThreadPoolExecutor>();
+            mSpecialExectorMap = new HashMap();
         }
     }
 

@@ -2,6 +2,8 @@ package com.michael.corelib.corelog;
 
 import android.text.TextUtils;
 
+import com.michael.corelib.config.CoreConfig;
+
 import java.util.HashMap;
 
 /**
@@ -20,15 +22,15 @@ public class CoreLog {
     private CoreLog() {
     }
 
-    public DebugLog getDebugLogByFileName(String logFileName) {
+    public DebugLog getDebugLogByFileName(String path,String logFileName) {
         if (TextUtils.isEmpty(logFileName)) {
             logFileName = "debug_log.txt";
         }
 
-        DebugLog debugLog = mDebugLogMap.get(logFileName);
+        DebugLog debugLog = mDebugLogMap.get(path + "/" + logFileName);
         if (debugLog == null) {
-            debugLog = new DebugLog(logFileName);
-            mDebugLogMap.put(logFileName, debugLog);
+            debugLog = new DebugLog(path,logFileName);
+            mDebugLogMap.put(path + "/" + logFileName, debugLog);
         }
 
         return debugLog;
