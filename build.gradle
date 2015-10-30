@@ -9,8 +9,9 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: 'findbugs'
+apply plugin: 'pmd'
 
-def CORE_SDK_VERSION = "15.09.17"
+def CORE_SDK_VERSION = "15.10.30"
 
 android {
     compileSdkVersion 21
@@ -60,8 +61,46 @@ task findbugs(type: FindBugs) {
         effort = 'max'
         reports {
             xml.enabled = false
-            html.enabled = true
+                html.enabled = true
         }
+}
+
+task pmd(type: Pmd) {
+    source fileTree('src')
+
+        ruleSets = [
+        'java-android',
+        'java-basic',
+        'java-braces',
+        'java-clone',
+        'java-codesize',
+        'java-comments',
+        'java-controversial',
+        'java-coupling',
+        'java-design',
+        'java-empty',
+        'java-finalizers',
+        'java-imports',
+        'java-j2ee',
+        'java-javabeans',
+        'java-junit',
+        'java-logging-jakarta-commons',
+        'java-logging-java',
+        'java-migrating',
+        'java-naming',
+        'java-optimizations',
+        'java-strictexception',
+        'java-strings',
+        'java-sunsecure',
+        'java-typeresolution',
+        'java-unnecessary',
+        'java-unusedcode'
+            ]
+
+            reports {
+                xml.enabled = false
+                    html.enabled = true
+            }
 }
 
 task clearJar(type: Delete) {

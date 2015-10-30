@@ -74,7 +74,7 @@ public class DebugLog {
         writeLog(VERBOSE_VERBOSE_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
-                Log.d(TAG, "[[" + tag + "]]" + msg, tr);
+                Log.d(tag, msg, tr);
             } else {
                 Log.d(TAG, msg, tr);
             }
@@ -104,7 +104,7 @@ public class DebugLog {
         writeLog(VERBOSE_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
-                Log.v(TAG, "[[" + tag + "]]" + msg, tr);
+                Log.v(tag, msg, tr);
             } else {
                 Log.v(TAG, msg, tr);
             }
@@ -134,7 +134,7 @@ public class DebugLog {
         writeLog(DEBUG_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
-                Log.d(TAG, "[[" + tag + "]]" + msg, tr);
+                Log.d(tag, msg, tr);
             } else {
                 Log.d(TAG, msg, tr);
             }
@@ -164,7 +164,7 @@ public class DebugLog {
         writeLog(WARNING_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
-                Log.w(TAG, "[[" + tag + "]]" + msg, tr);
+                Log.w(tag, msg, tr);
             } else {
                 Log.w(TAG, msg, tr);
             }
@@ -194,7 +194,7 @@ public class DebugLog {
         writeLog(ERORR_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
-                Log.e(TAG, "[[" + tag + "]]" + msg, tr);
+                Log.e(tag, msg, tr);
             } else {
                 Log.e(TAG, msg, tr);
             }
@@ -224,7 +224,7 @@ public class DebugLog {
         writeLog(RELEASE_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
-                Log.e(TAG, "[[" + tag + "]]" + msg, tr);
+                Log.e(tag, msg, tr);
             } else {
                 Log.e(TAG, msg, tr);
             }
