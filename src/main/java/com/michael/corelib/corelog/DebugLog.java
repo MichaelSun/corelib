@@ -296,7 +296,9 @@ public class DebugLog {
         } catch (Exception e) {
             e.printStackTrace();
             try {
-                mOutWriter.close();
+                if (mOutWriter != null) {
+                    mOutWriter.close();
+                }
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

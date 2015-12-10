@@ -1,6 +1,6 @@
 package com.michael.corelib.aop;
 
-import com.michael.corelib.config.CoreConfig;
+import com.michael.corelib.internet.NetworkLog;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -18,10 +18,8 @@ class AOPInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-        CoreConfig.LOGD("<<AOPInvocationHandler>> invoke method : " + method.getName());
-
-        return  method.invoke(proxyObject, args);
+        NetworkLog.LOGD("<<AOPInvocationHandler>> invoke method : " + method.getName());
+        return method.invoke(proxyObject, args);
 
     }
 

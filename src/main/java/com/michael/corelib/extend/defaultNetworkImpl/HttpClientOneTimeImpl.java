@@ -65,7 +65,7 @@ public class HttpClientOneTimeImpl {
                 }
 
                 return (T) httpClient.execute(requestBase);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {

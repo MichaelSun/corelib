@@ -9,7 +9,12 @@ public class NetworkLog {
 
     public static void LOGD(String msg) {
         if (CoreConfig.DEBUG) {
-            CoreConfig.LOGD(msg);
+            try {
+                CoreConfig.LOGD(msg);
+            } catch (Exception e) {
+                //do nothing
+            }
+
         }
     }
 

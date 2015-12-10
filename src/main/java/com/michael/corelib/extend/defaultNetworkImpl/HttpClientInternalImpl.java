@@ -4,12 +4,18 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
+
 import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.internet.core.HttpClientInterface;
 import com.michael.corelib.internet.core.NetWorkException;
 import com.michael.corelib.internet.core.RequestBase;
 import com.michael.corelib.internet.core.util.InternetStringUtils;
-import org.apache.http.*;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -36,7 +42,11 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.*;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.List;
 
@@ -134,7 +144,7 @@ public class HttpClientInternalImpl implements HttpClientInterface {
             preExecuteHttpRequest();
             try {
                 return (T) mHttpClient.execute(requestBase);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
