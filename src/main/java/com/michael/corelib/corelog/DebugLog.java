@@ -130,8 +130,6 @@ public class DebugLog {
      * @param tr  An exception to log
      */
     public void d(String tag, String msg, Throwable tr) {
-
-
         writeLog(DEBUG_TAG, tag, msg, tr);
         if (DUMP_LOG_TO_CONSOLE) {
             if (tag != null && !tag.equals("")) {
@@ -244,8 +242,7 @@ public class DebugLog {
         mOutWriter = null;
     }
 
-    private synchronized void writeLog(String level, String tag, String msg,
-                                       Throwable tr) {
+    private synchronized void writeLog(String level, String tag, String msg, Throwable tr) {
         File file = new File(LOG_DIR,LOG_CURR_FILENAME);
         if (!file.exists()) {
             mOutWriter = null;

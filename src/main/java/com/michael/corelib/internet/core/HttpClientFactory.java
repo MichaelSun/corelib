@@ -9,13 +9,18 @@ public class HttpClientFactory {
 
     private static HttpClientInterface gHttpClientInterface;
 
-	public synchronized static HttpClientInterface createHttpClientInterface(Context context) {
+    public synchronized static HttpClientInterface createHttpClientInterface(Context context) {
         if (gHttpClientInterface == null) {
-            Object ret = ProxyFactory.newProxyObj(new HttpClientInternalImpl());
+            if (CoreConfig.VERSION.AOP_SUPPORT) {
+                Object ret = ProxyFactory.newProxyObj(new HttpClientInternalImpl());
 
-            CoreConfig.LOGD("[[createHttpClientInterface]] proxy type = " + ret.getClass().getName());
+                CoreConfig.LOGD("[[createHttpClientInterface]] proxy type = " + ret.getClass().getName());
 
-            gHttpClientInterface = (HttpClientInterface) ret;
+                gHttpClientInterface = (HttpClientInterface) ret;
+            } else {
+                gHttpClientInterface = new HttpClientInternalImpl();
+            }
+
             if (!gHttpClientInterface.init(context)) {
                 //TODO: may be performance error
                 gHttpClientInterface = null;
@@ -23,6 +28,6 @@ public class HttpClientFactory {
         }
 
         return gHttpClientInterface;
-	}
+    }
 
 }

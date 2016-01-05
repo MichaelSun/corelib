@@ -40,11 +40,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "SDK_VERSION", "\"${CORE_SDK_VERSION}\""
+            buildConfigField "Boolean", "AOP_SUPPORT", "false"
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "SDK_VERSION", "\"${CORE_SDK_VERSION}\""
+            buildConfigField "boolean", "AOP_SUPPORT", "false"
         }
     }
 }

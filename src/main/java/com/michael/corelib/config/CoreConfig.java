@@ -3,8 +3,6 @@ package com.michael.corelib.config;
 import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.michael.corelib.BuildConfig;
 import com.michael.corelib.corelog.CoreLog;
 import com.michael.corelib.corelog.DebugLog;
@@ -44,7 +42,6 @@ public class CoreConfig {
         }
         init(context, debug, "");
     }
-
 
     /**
      * 初始化corelib
@@ -178,11 +175,11 @@ public class CoreConfig {
         }
     }
 
-
     public static final class VERSION {
 
         public static final String SDK_VERSION = BuildConfig.SDK_VERSION;
 
+        public static final boolean AOP_SUPPORT = BuildConfig.AOP_SUPPORT;
     }
 
 }
