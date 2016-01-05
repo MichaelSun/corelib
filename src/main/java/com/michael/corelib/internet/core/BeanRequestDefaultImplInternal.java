@@ -3,11 +3,11 @@ package com.michael.corelib.internet.core;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import com.google.gson.Gson;
 import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.extend.defaultNetworkImpl.MultipartHttpEntity;
 import com.michael.corelib.internet.NetworkLog;
 import com.michael.corelib.internet.core.util.InternetStringUtils;
-import com.michael.corelib.internet.core.util.JsonUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -100,7 +100,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                } else if(contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_JSON_OBJ)){
+                } else if(contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_JSON_OBJ)) {
                     requestEntity.setContentType(RequestEntity.REQUEST_CONTENT_TYPE_JSON);
                     try {
                         entity = new StringEntity(convertNVPairToJsonObj(baseParams), HTTP.UTF_8);
@@ -206,7 +206,8 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
             if (request.isStringRawResponse() || (request.getGenericType() == String.class)) {
                 return (T) response;
             } else {
-                ret = JsonUtils.parse(response, request.getGenericType());
+                ret = new Gson().fromJson(response, request.getGenericType());
+//                ret = JsonUtils.parse(response, request.getGenericType());
                 if (ret != null && ret instanceof ResponseBase) {
                     NetworkResponse info = new NetworkResponse(httpResponse.getStatusLine().getStatusCode(), response, httpResponse.getAllHeaders());
                     ((ResponseBase) ret).networkResponse = info;
