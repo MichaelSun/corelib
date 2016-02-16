@@ -52,6 +52,16 @@ public abstract class RequestBase<T> {
 
     private boolean mShouldUrlEncodedParam;
 
+    private boolean mShowResponseLog;
+
+    public void setShowResponseLog(boolean show) {
+        mShowResponseLog = show;
+    }
+
+    public boolean getShowResponseLog() {
+        return mShowResponseLog;
+    }
+
     public boolean isStringRawResponse() {
         return mStringRawResponse;
     }

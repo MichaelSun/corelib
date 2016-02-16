@@ -194,7 +194,11 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
             }
         }
 
-        dumpResponse(request.getClass().getName(), response);
+        if (request.getShowResponseLog()) {
+            dumpResponse(request.getClass().getName(), response);
+        } else {
+            dumpResponseSample(request.getClass().getName());
+        }
 
         if (response == null) {
             NetworkResponse networkResponse = new NetworkResponse(httpResponse.getStatusLine().getStatusCode(), null, httpResponse.getAllHeaders());
@@ -325,9 +329,21 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         }
     }
 
+    private void dumpResponseSample(String request) {
+        if (CoreConfig.DEBUG) {
+            StringBuilder sb = new StringBuilder(1024);
+            sb.append("\n\n")
+                .append("//*****\n")
+                .append("| ------------- begin response ------------\n")
+                .append("|\n")
+                .append("| [[Request::" + request + "]] SAMPLE response")
+                .append("|\n").append("| ------------- end response ------------\n").append("\\\\*****\n");
+            NetworkLog.LOGD(sb.toString());
+        }
+    }
+
     private void dumpResponse(String request, String response) {
         if (CoreConfig.DEBUG) {
-            NetworkLog.LOGD(response);
             long endTime = System.currentTimeMillis();
             StringBuilder sb = new StringBuilder(1024);
             sb.append("\n\n")
