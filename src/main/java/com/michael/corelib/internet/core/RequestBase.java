@@ -52,7 +52,7 @@ public abstract class RequestBase<T> {
 
     private boolean mShouldUrlEncodedParam;
 
-    private boolean mShowResponseLog;
+    private boolean mShowResponseLog = true;
 
     public void setShowResponseLog(boolean show) {
         mShowResponseLog = show;
