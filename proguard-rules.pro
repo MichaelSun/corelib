@@ -15,3 +15,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+#corelib config
+-keep class com.michael.corelib.** {*;}
+-keep class com.google.code.gson.** {*;}
