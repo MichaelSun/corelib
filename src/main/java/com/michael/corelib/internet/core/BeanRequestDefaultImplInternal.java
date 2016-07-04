@@ -3,11 +3,13 @@ package com.michael.corelib.internet.core;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+
 import com.michael.corelib.config.CoreConfig;
 import com.michael.corelib.extend.defaultNetworkImpl.MultipartHttpEntity;
 import com.michael.corelib.internet.NetworkLog;
 import com.michael.corelib.internet.core.util.InternetStringUtils;
 import com.michael.corelib.internet.core.util.JsonUtils;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -100,7 +102,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                } else if(contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_JSON_OBJ)) {
+                } else if (contentType.equals(RequestEntity.REQUEST_CONTENT_TYPE_JSON_OBJ)) {
                     requestEntity.setContentType(RequestEntity.REQUEST_CONTENT_TYPE_JSON);
                     try {
                         entity = new StringEntity(convertNVPairToJsonObj(baseParams), HTTP.UTF_8);
@@ -108,7 +110,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
                         e.printStackTrace();
                     }
 
-                }else {
+                } else {
                     List<NameValuePair> paramList = convertBundleToNVPair(baseParams);
                     if (paramList != null) {
                         try {
@@ -185,9 +187,17 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         if (httpResponse.getStatusLine() != null
                 && String.valueOf(httpResponse.getStatusLine().getStatusCode()).startsWith("2")) {
             try {
-                String str = InternetStringUtils.unGzipBytesToString(httpResponse.getEntity().getContent());
-                if(!TextUtils.isEmpty(str)){
-                    response = str.trim();
+                HttpEntity httpEntity = httpResponse.getEntity();
+
+                if (httpEntity != null) {
+
+                    String str = InternetStringUtils.unGzipBytesToString(httpEntity.getContent());
+
+                    if (!TextUtils.isEmpty(str)) {
+
+                        response = str.trim();
+
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -236,7 +246,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         Set<String> keySet = bundle.keySet();
         for (String key : keySet) {
             sb.append("\"").append(key).append("\"").append(":")
-                .append("\"").append(bundle.get(key)).append("\"").append(",");
+                    .append("\"").append(bundle.get(key)).append("\"").append(",");
         }
 
         String str = sb.substring(0, sb.lastIndexOf(",")) + "}";
@@ -248,7 +258,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         return str;
     }
 
-    private String convertNVPairToJsonObj(Bundle bundle){
+    private String convertNVPairToJsonObj(Bundle bundle) {
         if (bundle == null) {
             return null;
         }
@@ -325,7 +335,7 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
             }
 
             NetworkLog.LOGD("\n\n//*****\n| [[request::" + request + "]] \n" + "| RestAPI URL = " + api_url
-                                + "\n| Params is = \n" + param + " \n\\\\*****\n");
+                    + "\n| Params is = \n" + param + " \n\\\\*****\n");
         }
     }
 
@@ -333,11 +343,11 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
         if (CoreConfig.DEBUG) {
             StringBuilder sb = new StringBuilder(1024);
             sb.append("\n\n")
-                .append("//*****\n")
-                .append("| ------------- begin response ------------\n")
-                .append("|\n")
-                .append("| [[Request::" + request + "]] SAMPLE response")
-                .append("|\n").append("| ------------- end response ------------\n").append("\\\\*****\n");
+                    .append("//*****\n")
+                    .append("| ------------- begin response ------------\n")
+                    .append("|\n")
+                    .append("| [[Request::" + request + "]] SAMPLE response")
+                    .append("|\n").append("| ------------- end response ------------\n").append("\\\\*****\n");
             NetworkLog.LOGD(sb.toString());
         }
     }
@@ -347,10 +357,10 @@ class BeanRequestDefaultImplInternal implements BeanRequestInterface {
             long endTime = System.currentTimeMillis();
             StringBuilder sb = new StringBuilder(1024);
             sb.append("\n\n")
-                .append("//*****\n")
-                .append("| ------------- begin response ------------\n")
-                .append("|\n")
-                .append("| [[Request::" + request + "]] raw response string = ");
+                    .append("//*****\n")
+                    .append("| ------------- begin response ------------\n")
+                    .append("|\n")
+                    .append("| [[Request::" + request + "]] raw response string = ");
             NetworkLog.LOGD(sb.toString());
             sb.setLength(0);
             if (response != null) {
